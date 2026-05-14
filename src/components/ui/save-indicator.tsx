@@ -12,9 +12,9 @@ export function SaveIndicator({ state }: { state: SaveState }) {
     <span
       className={clsx(
         "inline-flex items-center gap-1.5 text-xs font-semibold transition-opacity",
-        state === "saving" && "text-on-surface-variant",
-        state === "saved" && "text-tertiary",
-        state === "error" && "text-error"
+        state === "saving" && "text-[#878787]",
+        state === "saved" && "text-[#80c7a0]",
+        state === "error" && "text-[#e84242]"
       )}
     >
       {state === "saving" && (

@@ -85,8 +85,6 @@ export async function saveBracketPredictions(
     }
   }
 
-  revalidatePath("/app/simulador");
   revalidatePath("/app/ranking");
-  revalidatePath("/app", "layout");
   return { success: true };
 }

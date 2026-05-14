@@ -1,10 +1,8 @@
 import { redirect } from "next/navigation";
-import { cookies } from "next/headers";
 import { getSessionUser } from "@/lib/session";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { TopAppBar } from "@/components/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
-import { CheckTheme } from "@/components/check-theme";
 
 export default async function AppLayout({
   children,
@@ -37,19 +35,7 @@ export default async function AppLayout({
   }
 
   return (
-    <div
-      className="min-h-screen text-on-background"
-      style={{
-        background: "#0d1117",
-        backgroundImage: [
-          "radial-gradient(ellipse 90% 55% at 10% 5%, rgba(255,185,85,0.10) 0%, transparent 55%)",
-          "radial-gradient(ellipse 70% 45% at 90% 90%, rgba(89,222,155,0.07) 0%, transparent 50%)",
-          "radial-gradient(ellipse 60% 70% at 50% 50%, rgba(13,27,42,0.8) 0%, transparent 80%)",
-        ].join(", "),
-        backgroundAttachment: "fixed",
-      }}
-    >
-      <CheckTheme />
+    <div className="min-h-screen bg-[#f8f9fa] text-on-background">
       <TopAppBar
         user={{
           id: user.id,

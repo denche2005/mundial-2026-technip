@@ -178,39 +178,42 @@ export function AdminBracketPanel({
         });
     }
 
+    // suppress unused var lint — choose is available for future match-based UI
+    void choose;
+
     return (
-        <div className="space-y-porra-lg">
+        <div className="space-y-6">
             {error && (
-                <div className="rounded-lg border border-error/40 bg-error/10 p-3 text-sm text-error">
+                <div className="rounded-lg border border-[#e84242]/30 bg-[#ffdad6] p-3 text-sm text-[#e84242]">
                     {error}
                 </div>
             )}
             {ok && (
-                <div className="rounded-lg border border-tertiary/40 bg-tertiary/10 p-3 text-sm text-tertiary flex items-center gap-2">
+                <div className="rounded-lg border border-[#80c7a0]/40 bg-[#d8f5e6] p-3 text-sm text-[#2d6a4f] flex items-center gap-2">
                     <CheckCircle2 className="h-4 w-4" />
                     {ok}
                 </div>
             )}
 
-            <section className="rounded-xl border border-white/10 bg-surface-container p-porra-md md:p-porra-lg">
+            <section className="rounded-xl border border-[#dedede] bg-white p-4 md:p-6 shadow-sm">
                 <div className="flex items-center justify-between gap-3 flex-wrap">
                     <div>
-                        <p className="font-label-caps text-label-caps text-on-surface-variant">Resultados oficiales</p>
-                        <p className="text-body-md text-on-surface-variant">Marca ganadores por ronda. Los picks guardados reemplazan lo previo.</p>
+                        <p className="text-[10px] font-bold tracking-widest text-[#878787] uppercase">Resultados oficiales</p>
+                        <p className="text-sm text-[#555]">Marca ganadores por ronda. Los picks guardados reemplazan lo previo.</p>
                     </div>
-                    <div className="flex items-center gap-2 text-xs text-on-surface-variant">
-                        <span className="rounded-full border border-white/10 bg-surface-container-high px-3 py-1">Guardado por ronda</span>
-                        <span className="rounded-full border border-white/10 bg-surface-container-high px-3 py-1">Campeón final</span>
+                    <div className="flex items-center gap-2 text-xs text-[#878787]">
+                        <span className="rounded-full border border-[#dedede] bg-[#f0f2f5] px-3 py-1">Guardado por ronda</span>
+                        <span className="rounded-full border border-[#dedede] bg-[#f0f2f5] px-3 py-1">Campeón final</span>
                     </div>
                 </div>
             </section>
 
             {rounds.map((round) => (
-                <section key={round.round} className="rounded-xl border border-white/10 bg-surface-container p-porra-md md:p-porra-lg space-y-3">
+                <section key={round.round} className="rounded-xl border border-[#dedede] bg-white p-4 md:p-6 space-y-3 shadow-sm">
                     <div className="flex items-center justify-between gap-2 flex-wrap">
                         <div>
-                            <h2 className="font-headline-sm text-headline-sm text-on-surface">{round.label}</h2>
-                            <p className="text-xs text-on-surface-variant">
+                            <h2 className="font-bold text-lg text-[#004c84]">{round.label}</h2>
+                            <p className="text-xs text-[#555]">
                                 Selecciona {defaultSlotCount(round.round)} equipos y guarda la ronda.
                             </p>
                         </div>
@@ -218,7 +221,7 @@ export function AdminBracketPanel({
                             <button
                                 type="button"
                                 onClick={() => clearRound(round.round)}
-                                className="rounded-lg border border-outline-variant bg-surface-container-high px-3 py-1.5 text-xs font-semibold text-on-surface-variant hover:text-on-surface"
+                                className="rounded-lg border border-[#dedede] bg-[#f0f2f5] px-3 py-1.5 text-xs font-semibold text-[#555] hover:text-[#1a1a2e]"
                                 disabled={pending}
                             >
                                 Limpiar
@@ -226,7 +229,7 @@ export function AdminBracketPanel({
                             <button
                                 type="button"
                                 onClick={() => resetSavedRound(round.round)}
-                                className="rounded-lg border border-outline-variant bg-surface-container-high px-3 py-1.5 text-xs font-semibold text-on-surface-variant hover:text-on-surface disabled:opacity-60"
+                                className="rounded-lg border border-[#dedede] bg-[#f0f2f5] px-3 py-1.5 text-xs font-semibold text-[#555] hover:text-[#1a1a2e] disabled:opacity-60"
                                 disabled={pending}
                             >
                                 Reiniciar ronda
@@ -234,7 +237,7 @@ export function AdminBracketPanel({
                             <button
                                 type="button"
                                 onClick={() => saveRound(round.round)}
-                                className="inline-flex items-center gap-1 rounded-lg bg-secondary px-3 py-1.5 text-xs font-semibold text-on-secondary shadow-[0_0_16px_rgba(255,185,85,0.16)] disabled:opacity-60"
+                                className="inline-flex items-center gap-1 rounded-lg bg-[#0070ef] px-3 py-1.5 text-xs font-semibold text-white shadow-[0_4px_12px_rgba(0,112,239,0.2)] disabled:opacity-60"
                                 disabled={pending}
                             >
                                 <Save className="h-3.5 w-3.5" /> Guardar ronda
@@ -242,13 +245,13 @@ export function AdminBracketPanel({
                         </div>
                     </div>
 
-                    <div className="rounded-xl border border-outline-variant/70 bg-surface-container-high p-3">
+                    <div className="rounded-xl border border-[#dedede] bg-[#f8f9fa] p-3">
                         <div className="mb-3 flex items-center justify-between">
-                            <p className="text-xs text-on-surface-variant">
+                            <p className="text-xs text-[#878787]">
                                 Seleccionados: {(selectedByRound.get(round.round) ?? []).length}/{defaultSlotCount(round.round)}
                             </p>
                             {round.matches.length > 0 && (
-                                <p className="text-[11px] text-on-surface-variant">
+                                <p className="text-[11px] text-[#878787]">
                                     Hay {round.matches.length} cruces cargados en esta ronda.
                                 </p>
                             )}
@@ -262,8 +265,8 @@ export function AdminBracketPanel({
                                         type="button"
                                         onClick={() => toggleRoundTeam(round.round, team)}
                                         className={`rounded-lg border px-3 py-2 text-left transition flex items-center gap-2 ${active
-                                            ? "border-secondary/60 bg-secondary/15 text-secondary"
-                                            : "border-outline-variant bg-surface-container text-on-surface hover:border-secondary/35"
+                                            ? "border-[#0070ef] bg-[#e0efff] text-[#004c84]"
+                                            : "border-[#dedede] bg-white text-[#555] hover:border-[#0070ef]/40"
                                             }`}
                                     >
                                         <Flag code={team} size="sm" rounded="full" />
@@ -276,10 +279,10 @@ export function AdminBracketPanel({
                 </section>
             ))}
 
-            <section className="rounded-xl border border-white/10 bg-surface-container p-porra-md md:p-porra-lg">
+            <section className="rounded-xl border border-[#dedede] bg-white p-4 md:p-6 shadow-sm">
                 <div className="flex items-center justify-between gap-2 mb-3">
-                    <h2 className="font-headline-sm text-headline-sm text-on-surface flex items-center gap-2">
-                        <Trophy className="h-4 w-4 text-secondary" /> Campeón
+                    <h2 className="font-bold text-lg text-[#004c84] flex items-center gap-2">
+                        <Trophy className="h-4 w-4 text-[#80c7a0]" /> Campeón
                     </h2>
                     <div className="flex items-center gap-2">
                         <button
@@ -292,7 +295,7 @@ export function AdminBracketPanel({
                                     else setOk("Campeón reiniciado");
                                 });
                             }}
-                            className="rounded-lg border border-outline-variant bg-surface-container-high px-3 py-1.5 text-xs font-semibold text-on-surface-variant hover:text-on-surface disabled:opacity-60"
+                            className="rounded-lg border border-[#dedede] bg-[#f0f2f5] px-3 py-1.5 text-xs font-semibold text-[#555] hover:text-[#1a1a2e] disabled:opacity-60"
                             disabled={pending}
                         >
                             Reiniciar
@@ -300,7 +303,7 @@ export function AdminBracketPanel({
                         <button
                             type="button"
                             onClick={saveChampion}
-                            className="inline-flex items-center gap-1 rounded-md bg-secondary px-3 py-1.5 text-xs font-semibold text-on-secondary disabled:opacity-60"
+                            className="inline-flex items-center gap-1 rounded-md bg-[#0070ef] px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-60"
                             disabled={pending}
                         >
                             <Save className="h-3.5 w-3.5" /> Guardar campeón
@@ -309,7 +312,7 @@ export function AdminBracketPanel({
                 </div>
 
                 {finalCandidates.length === 0 ? (
-                    <p className="text-sm text-on-surface-variant">
+                    <p className="text-sm text-[#555]">
                         Primero selecciona finalistas (en ronda Final) para poder marcar campeón.
                     </p>
                 ) : (
@@ -322,8 +325,8 @@ export function AdminBracketPanel({
                                     key={`champion-${team}`}
                                     onClick={() => setChampion(team)}
                                     className={`rounded-lg border px-3 py-2 text-left transition flex items-center gap-2 ${active
-                                        ? "border-secondary/60 bg-secondary/15 text-secondary"
-                                        : "border-outline-variant bg-surface-container-high text-on-surface hover:border-secondary/35"
+                                        ? "border-[#80c7a0] bg-[#d8f5e6] text-[#2d6a4f]"
+                                        : "border-[#dedede] bg-[#f8f9fa] text-[#555] hover:border-[#80c7a0]/40"
                                         }`}
                                 >
                                     <Flag code={team} size="sm" rounded="full" />

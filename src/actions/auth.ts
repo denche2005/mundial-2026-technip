@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { createServiceClient } from "@/lib/supabase/service";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { sanitizeInternalPath } from "@/lib/auth-redirect";
+import { cookiePathForApp, withPublicBasePath } from "@/lib/base-path";
 import { pbkdf2Sync, randomBytes, timingSafeEqual } from "crypto";
 
 function hashPassword(password: string) {
@@ -20,7 +21,35 @@ function verifyPassword(password: string, encoded: string) {
   return timingSafeEqual(Buffer.from(computed, "utf8"), Buffer.from(expected, "utf8"));
 }
 
+function supabaseErrText(err: unknown): string {
+  if (err == null) return "error desconocido";
+  const parts: string[] = [];
+  let cur: unknown = err;
+  for (let i = 0; i < 6 && cur != null; i += 1) {
+    if (cur instanceof Error) {
+      parts.push(cur.message);
+      cur = cur.cause;
+      continue;
+    }
+    if (typeof cur === "object") {
+      const o = cur as Record<string, unknown>;
+      if (typeof o.message === "string") parts.push(o.message);
+      if ("cause" in o) {
+        cur = o.cause;
+        continue;
+      }
+    }
+    break;
+  }
+  let text = parts.filter(Boolean).join(" — ");
+  if (!text) text = String(err);
 
+  if (/issuer certificate|UNABLE_TO_GET_ISSUER|fetch failed/i.test(text)) {
+    text +=
+      " [TLS/proxy: en local usa npm run dev:insecure-tls (solo desarrollo) o NODE_EXTRA_CA_CERTS con el PEM corporativo]";
+  }
+  return text;
+}
 
 export async function loginWithPassword(
   email: string,
@@ -29,7 +58,7 @@ export async function loginWithPassword(
 ) {
   try {
     const supabase = createServiceClient();
-    const redirectTo = sanitizeInternalPath(next);
+    const redirectTo = withPublicBasePath(sanitizeInternalPath(next));
     const { data: byEmail, error: byEmailError } = await supabase
       .from("profiles")
       .select("id, password_hash")
@@ -37,7 +66,7 @@ export async function loginWithPassword(
       .maybeSingle();
 
     if (byEmailError && byEmailError.code !== "PGRST116") {
-      return { error: `Error al buscar perfil: ${byEmailError.message}` };
+      return { error: `Error al buscar perfil: ${supabaseErrText(byEmailError)}` };
     }
     if (!byEmail) return { error: "No existe una cuenta con este email. Regístrate primero." };
     if (!byEmail.password_hash) {
@@ -58,7 +87,7 @@ export async function loginWithPassword(
       secure: isSecure,
       sameSite: "lax",
       maxAge: 60 * 60 * 24 * 90,
-      path: "/",
+      path: cookiePathForApp(),
     });
 
     return { redirectTo };
@@ -77,14 +106,16 @@ export async function registerWithPassword(
 ) {
   try {
     const supabase = createServiceClient();
-    const redirectTo = sanitizeInternalPath(next);
+    const redirectTo = withPublicBasePath(sanitizeInternalPath(next));
     const name = (fullName.trim() || email.split("@")[0]).slice(0, 80);
     const { data: existing, error: existingError } = await supabase
       .from("profiles")
       .select("id")
       .eq("email", email)
       .maybeSingle();
-    if (existingError) return { error: `Error validando cuenta: ${existingError.message}` };
+    if (existingError) {
+      return { error: `Error validando cuenta: ${supabaseErrText(existingError)}` };
+    }
     if (existing) return { error: "Ya existe una cuenta con este email. Inicia sesión." };
 
     const password_hash = hashPassword(password);
@@ -93,7 +124,9 @@ export async function registerWithPassword(
       .insert({ email, full_name: name, password_hash })
       .select("id")
       .single();
-    if (error || !created) return { error: `Error creando cuenta: ${error?.message ?? "Sin datos"}` };
+    if (error || !created) {
+      return { error: `Error creando cuenta: ${supabaseErrText(error ?? null)}` };
+    }
 
     const cookieStore = await cookies();
     const isSecure = process.env.NODE_ENV === "production"
@@ -105,7 +138,7 @@ export async function registerWithPassword(
       secure: isSecure,
       sameSite: "lax",
       maxAge: 60 * 60 * 24 * 90,
-      path: "/",
+      path: cookiePathForApp(),
     });
 
     return { redirectTo };
@@ -125,6 +158,10 @@ export async function logout() {
   }
 
   const cookieStore = await cookies();
-  cookieStore.delete("session_user");
+  cookieStore.set("session_user", "", {
+    httpOnly: true,
+    path: cookiePathForApp(),
+    maxAge: 0,
+  });
   redirect("/");
 }

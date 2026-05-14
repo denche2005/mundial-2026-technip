@@ -7,8 +7,6 @@ export default async function SimuladorPage() {
   const user = await getSessionUser();
   if (!user) redirect("/login");
 
-  // Sesión por cookie (sin JWT Supabase): el cliente anon no pasa RLS de
-  // bracket_predictions. Tras verificar sesión, leemos solo las filas del usuario.
   const service = createServiceClient();
 
   const { data: predictions } = await service
@@ -26,19 +24,12 @@ export default async function SimuladorPage() {
     : false;
 
   return (
-    <div className="relative min-h-[calc(100vh-4rem)] bg-primary-container px-container-margin py-porra-lg md:py-porra-xl">
-      <div
-        className="pointer-events-none absolute inset-0 bg-cover bg-center opacity-15"
-        style={{
-          backgroundImage:
-            "url(https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=1600&q=80)",
-        }}
-      />
+    <div className="relative min-h-[calc(100vh-4rem)] bg-[#f8f9fa] px-container-margin py-porra-lg md:py-porra-xl">
       <div className="relative mx-auto mb-6 max-w-6xl">
-        <h1 className="font-display-lg text-display-lg text-on-background mb-1">
+        <h1 className="text-3xl font-bold text-[#004c84] mb-1">
           Camino a la Final
         </h1>
-        <p className="font-body-md text-body-md text-on-surface-variant">
+        <p className="text-sm text-[#555]">
           Arma tu árbol completo y define a tu campeón del Mundial 2026.
         </p>
       </div>

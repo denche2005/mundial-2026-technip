@@ -7,9 +7,18 @@ import { NextResponse, type NextRequest } from "next/server";
  */
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  const base = request.nextUrl.basePath ?? "";
+
+  /** Next puede exponer `pathname` con o sin `basePath` según versión; normalizamos. */
+  let effectivePath = pathname;
+  if (base && pathname.startsWith(`${base}/`)) {
+    effectivePath = pathname.slice(base.length) || "/";
+  } else if (base && pathname === base) {
+    effectivePath = "/";
+  }
 
   // Only protect /app routes
-  if (!pathname.startsWith("/app")) {
+  if (!effectivePath.startsWith("/app")) {
     return NextResponse.next();
   }
 
@@ -28,8 +37,8 @@ export function middleware(request: NextRequest) {
   });
 
   if (!hasSession && !hasSbSession) {
-    const loginUrl = new URL("/login", request.url);
-    loginUrl.searchParams.set("next", pathname);
+    const loginUrl = new URL(`${base}/login`, request.url);
+    loginUrl.searchParams.set("next", effectivePath);
     return NextResponse.redirect(loginUrl);
   }
 

@@ -18,9 +18,8 @@ export function ShareBracketButton({ captureRef, userName }: ShareBracketButtonP
     return {
       cacheBust: true,
       pixelRatio,
-      backgroundColor: "#111412",
+      backgroundColor: "#f0f2f5",
       fetchRequestInit: { mode: "cors" as RequestMode, cache: "no-cache" as RequestCache },
-      /** backdrop-filter often produces blank/transparent regions in canvas export */
       onclone: (cloned: Document) => {
         const cap = cloned.querySelector<HTMLElement>("[data-bracket-capture]");
         if (cap) {
@@ -51,7 +50,6 @@ export function ShareBracketButton({ captureRef, userName }: ShareBracketButtonP
     const pixelRatio = Math.min(4, Math.max(3, dpr * 1.35));
     const opts = buildPngOptions(pixelRatio);
 
-    // Warm-up pass helps some browsers after lazy-loaded flags (CORS + cache).
     await toPng(target, opts).catch(() => null);
 
     try {
@@ -90,7 +88,6 @@ export function ShareBracketButton({ captureRef, userName }: ShareBracketButtonP
         return;
       }
 
-      // Build File directly from base64 data URL (safer on mobile browsers).
       const file = dataUrlToFile(dataUrl, "mi-bracket-mundial-2026.png");
 
       if (
@@ -103,12 +100,11 @@ export function ShareBracketButton({ captureRef, userName }: ShareBracketButtonP
         await navigator.share({
           files: [file],
           title: "Mi cuadro del Mundial 2026",
-          text: `${userName} — Mi camino a la final 🏆`,
+          text: `${userName} — Mi camino a la final`,
         });
         return;
       }
 
-      // Fallback: direct download
       const anchor = document.createElement("a");
       anchor.href = dataUrl;
       anchor.download = "mi-bracket-mundial-2026.png";
@@ -135,7 +131,7 @@ export function ShareBracketButton({ captureRef, userName }: ShareBracketButtonP
           type="button"
           onClick={handleShare}
           disabled={loading}
-          className="inline-flex items-center justify-center gap-2 rounded-xl bg-secondary px-6 py-3 text-on-secondary font-bold shadow-[0_0_24px_rgba(255,185,85,0.35)] transition hover:brightness-105 disabled:opacity-60"
+          className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#0070ef] px-6 py-3 text-white font-bold shadow-[0_4px_12px_rgba(0,112,239,0.25)] transition hover:brightness-105 disabled:opacity-60"
         >
           {loading ? (
             <>
@@ -154,7 +150,7 @@ export function ShareBracketButton({ captureRef, userName }: ShareBracketButtonP
         </button>
 
         {toast && (
-          <p className="rounded-lg bg-surface-container-high/90 px-4 py-1.5 text-xs text-on-surface border border-white/10 shadow">
+          <p className="rounded-lg bg-white px-4 py-1.5 text-xs text-[#1a1a2e] border border-[#dedede] shadow">
             {toast}
           </p>
         )}

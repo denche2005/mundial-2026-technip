@@ -26,7 +26,6 @@ import { BRACKET_CAPTURE_WIDTH_PX } from "@/lib/bracket/bracket-layout";
 
 type SaveState = "idle" | "saving" | "saved" | "error";
 
-/** Enough vertical room for headers + 760px tree + footer strip inside capture card. */
 const BRACKET_CAPTURE_MIN_H = 860;
 
 function shortSiteHost(): string {
@@ -62,7 +61,6 @@ function buildInitialState(predictions: BracketPrediction[]) {
         const groupIdx = Math.floor((p.position - 1) / 4);
         const slotIdx = (p.position - 1) % 4;
         const groupCode = WORLD_CUP_GROUPS[groupIdx]?.code;
-        // Slots 0..2 are user picks; slot 3 (4th place) is derived locally.
         if (groupCode && slotIdx < 3) standings[groupCode][slotIdx] = p.team;
       }
       if (p.position >= 101 && p.position <= 116) {
@@ -94,10 +92,6 @@ function buildInitialState(predictions: BracketPrediction[]) {
   return { standings, bestThirds, picks };
 }
 
-/**
- * The 4th-place finisher in a group is the team the user did NOT pick
- * after committing 1st/2nd/3rd. We derive it locally — no extra DB column.
- */
 function eliminatedTeam(groupCode: string, selected: string[]): string | null {
   if (selected.length < 3) return null;
   const teams = WORLD_CUP_GROUPS.find((g) => g.code === groupCode)?.teams ?? [];
@@ -117,6 +111,7 @@ export function BracketSimulator({ predictions, isLocked, userName = "Jugador" }
   const [bestThirds, setBestThirds] = useState<string[]>(initial.bestThirds);
   const [picks, setPicks] = useState<Record<string, string>>(initial.picks);
   const [saveState, setSaveState] = useState<SaveState>("idle");
+  const userDirtyRef = useRef(false);
 
   const predictionsKey = useMemo(
     () => predictionsSignature(predictions),
@@ -124,11 +119,13 @@ export function BracketSimulator({ predictions, isLocked, userName = "Jugador" }
   );
 
   useEffect(() => {
+    if (userDirtyRef.current) return;
     const next = buildInitialState(predictions);
     setStandings(next.standings);
     setBestThirds(next.bestThirds);
     setPicks(next.picks);
-  }, [predictionsKey]);
+  }, [predictionsKey]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const captureRef = useRef<HTMLDivElement | null>(null);
   const bracketViewportRef = useRef<HTMLDivElement | null>(null);
@@ -172,25 +169,20 @@ export function BracketSimulator({ predictions, isLocked, userName = "Jugador" }
     const cap = captureRef.current;
     if (!outer || !cap) return;
     const MIN_SCALE = 0.28;
-    const measureScale = () => {
+    const measure = () => {
       if (mobileNaturalBracketSize) {
         setBracketScale(1);
-        return;
+      } else {
+        const avail = outer.clientWidth;
+        const need = Math.max(cap.scrollWidth, 1);
+        if (avail) {
+          const raw = avail / need;
+          setBracketScale(Math.min(1, Math.max(MIN_SCALE, raw)));
+        }
       }
-      const avail = outer.clientWidth;
-      const need = Math.max(cap.scrollWidth, 1);
-      if (!avail) return;
-      const raw = avail / need;
-      setBracketScale(Math.min(1, Math.max(MIN_SCALE, raw)));
-    };
-    const measureHeight = () => {
       setBracketCaptureH(
         Math.max(BRACKET_CAPTURE_MIN_H, Math.ceil(cap.scrollHeight))
       );
-    };
-    const measure = () => {
-      measureScale();
-      measureHeight();
     };
     measure();
     const ro = new ResizeObserver(measure);
@@ -261,19 +253,32 @@ export function BracketSimulator({ predictions, isLocked, userName = "Jugador" }
   );
 
   useEffect(() => {
-    setBestThirds((prev) => pruneBestThirds(standings, prev));
-    setPicks((prev) => pruneKnockoutPicks(standings, bestThirds, prev));
-    // keep dependency compact to avoid looping after this effect updates values
+    let prunedThirds: string[] | null = null;
+    setBestThirds((prev) => {
+      const next = pruneBestThirds(standings, prev);
+      prunedThirds = next;
+      if (JSON.stringify(next) === JSON.stringify(prev)) return prev;
+      return next;
+    });
+    setPicks((prev) => {
+      const thirds = prunedThirds ?? bestThirds;
+      const next = pruneKnockoutPicks(standings, thirds, prev);
+      if (JSON.stringify(next) === JSON.stringify(prev)) return prev;
+      return next;
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [thirdSignature]);
 
   const toggleTeamInGroup = useCallback(
     (groupCode: string, team: string) => {
       if (isLocked) return;
+      userDirtyRef.current = true;
       setStandings((prev) => {
-        const current = prev[groupCode] ?? [];
-        if (current.includes(team)) {
-          return { ...prev, [groupCode]: current.filter((t) => t !== team) };
+        const current = [...(prev[groupCode] ?? [])];
+        const idx = current.indexOf(team);
+        if (idx !== -1) {
+          current.splice(idx, 1);
+          return { ...prev, [groupCode]: current };
         }
         if (current.length >= 3) return prev;
         return { ...prev, [groupCode]: [...current, team] };
@@ -285,6 +290,7 @@ export function BracketSimulator({ predictions, isLocked, userName = "Jugador" }
   const pickWinner = useCallback(
     (matchId: string, team: string) => {
       if (isLocked) return;
+      userDirtyRef.current = true;
       setPicks((prev) => ({ ...prev, [matchId]: team }));
     },
     [isLocked]
@@ -302,7 +308,7 @@ export function BracketSimulator({ predictions, isLocked, userName = "Jugador" }
   return (
     <div className="space-y-8">
       {isLocked && (
-        <div className="glass-panel rounded-xl p-3 text-secondary font-body-md flex items-center gap-2">
+        <div className="rounded-xl border border-[#dedede] bg-white p-3 text-[#555] font-body-md flex items-center gap-2">
           <Lock className="h-4 w-4" />
           Bracket bloqueado: el torneo ya comenzó.
         </div>
@@ -313,8 +319,8 @@ export function BracketSimulator({ predictions, isLocked, userName = "Jugador" }
       </div>
 
       <section className="space-y-4">
-        <h2 className="font-headline-lg text-headline-lg text-on-background">Fase de grupos</h2>
-        <p className="text-body-md text-on-surface-variant -mt-2">
+        <h2 className="font-headline-lg text-headline-lg text-[#004c84]">Fase de grupos</h2>
+        <p className="text-body-md text-[#555] -mt-2">
           Marca los 3 primeros de cada grupo. El 4º se rellena automáticamente
           con el equipo eliminado.
         </p>
@@ -325,12 +331,12 @@ export function BracketSimulator({ predictions, isLocked, userName = "Jugador" }
             const groupFillCount =
               selected.length < 3 ? selected.length : fourth ? 4 : 3;
             return (
-              <div key={group.code} className="glass-panel rounded-xl p-4">
+              <div key={group.code} className="rounded-xl border border-[#dedede] bg-white p-4 shadow-sm">
                 <div className="flex items-center justify-between mb-3">
-                  <h3 className="font-headline-sm text-headline-sm text-secondary">
+                  <h3 className="font-headline-sm text-headline-sm text-[#0070ef]">
                     Grupo {group.code}
                   </h3>
-                  <span className="text-label-caps text-on-surface-variant">
+                  <span className="text-label-caps text-[#878787]">
                     {groupFillCount}/4
                   </span>
                 </div>
@@ -345,10 +351,10 @@ export function BracketSimulator({ predictions, isLocked, userName = "Jugador" }
                         onClick={() => toggleTeamInGroup(group.code, team)}
                         disabled={isLocked}
                         className={clsx(
-                          "rounded-lg px-2 py-2 text-left border transition flex items-center gap-2",
+                          "rounded-lg px-2 py-2 text-left border transition-colors duration-150 flex items-center gap-2",
                           isSelected
-                            ? "border-secondary/50 bg-secondary/10 text-secondary"
-                            : "border-white/10 bg-surface-container text-on-surface-variant hover:border-secondary/40"
+                            ? "border-[#0070ef] bg-[#e0efff] text-[#004c84]"
+                            : "border-[#dedede] bg-[#f8f9fa] text-[#555] hover:border-[#0070ef]/40 hover:bg-[#e0efff]/30"
                         )}
                       >
                         <Flag code={team} size="sm" />
@@ -369,24 +375,24 @@ export function BracketSimulator({ predictions, isLocked, userName = "Jugador" }
                         className={clsx(
                           "rounded-lg border px-3 py-2 flex items-center gap-2 min-h-10",
                           isFilled
-                            ? "border-white/10 bg-surface-container"
+                            ? "border-[#dedede] bg-[#f0f2f5]"
                             : isAuto
-                              ? "border-dashed border-white/10 bg-surface-container-low"
-                              : "border-white/10 bg-surface-container"
+                              ? "border-dashed border-[#dedede] bg-[#f8f9fa]"
+                              : "border-[#dedede] bg-[#f8f9fa]"
                         )}
                       >
-                        <span className="font-data-mono text-data-mono w-4 text-on-surface-variant">
+                        <span className="font-data-mono text-data-mono w-4 text-[#878787]">
                           {slot + 1}
                         </span>
                         {isFilled ? (
                           <>
                             <Flag code={team!} size="sm" />
-                            <span className="font-body-md text-body-md">
+                            <span className="font-body-md text-body-md text-[#1a1a2e]">
                               {TEAM_NAMES[team!]}
                             </span>
                           </>
                         ) : (
-                          <span className="text-on-surface-variant text-sm">&nbsp;</span>
+                          <span className="text-[#878787] text-sm">&nbsp;</span>
                         )}
                       </div>
                     );
@@ -399,8 +405,8 @@ export function BracketSimulator({ predictions, isLocked, userName = "Jugador" }
       </section>
 
       <section className="space-y-4">
-        <h2 className="font-headline-lg text-headline-lg text-on-background">Mejores terceros</h2>
-        <div className="glass-panel rounded-xl p-4">
+        <h2 className="font-headline-lg text-headline-lg text-[#004c84]">Mejores terceros</h2>
+        <div className="rounded-xl border border-[#dedede] bg-white p-4 shadow-sm">
           <div className="flex flex-wrap gap-2">
             {allThirds.map(({ group, team }) => {
               const active = bestThirds.includes(team);
@@ -409,20 +415,21 @@ export function BracketSimulator({ predictions, isLocked, userName = "Jugador" }
                   key={`${group}-${team}`}
                   type="button"
                   onClick={() =>
-                    setBestThirds((prev) =>
-                      prev.includes(team)
+                    setBestThirds((prev) => {
+                      userDirtyRef.current = true;
+                      return prev.includes(team)
                         ? prev.filter((t) => t !== team)
                         : prev.length < 8
                           ? [...prev, team]
-                          : prev
-                    )
+                          : prev;
+                    })
                   }
                   disabled={isLocked}
                   className={clsx(
-                    "rounded-full px-3 py-1.5 border text-sm flex items-center gap-2",
+                    "rounded-full px-3 py-1.5 border text-sm flex items-center gap-2 transition-colors duration-150",
                     active
-                      ? "bg-tertiary/15 border-tertiary/40 text-tertiary"
-                      : "bg-surface-container border-white/10 text-on-surface-variant"
+                      ? "bg-[#d8f5e6] border-[#80c7a0] text-[#2d6a4f]"
+                      : "bg-[#f8f9fa] border-[#dedede] text-[#555] hover:border-[#80c7a0]/40"
                   )}
                 >
                   <Flag code={team} size="sm" rounded="full" />
@@ -431,41 +438,48 @@ export function BracketSimulator({ predictions, isLocked, userName = "Jugador" }
               );
             })}
           </div>
-          <p className="mt-3 text-label-caps text-on-surface-variant">
+          <p className="mt-3 text-label-caps text-[#878787]">
             Seleccionados: {bestThirds.length}/8
           </p>
         </div>
       </section>
 
       <section className="space-y-4">
-        <h2 className="font-headline-lg text-headline-lg text-on-background">Camino a la final</h2>
+        <h2 className="font-headline-lg text-headline-lg text-[#004c84]">Camino a la final</h2>
 
         {!bracket ? (
-          <p className="mx-auto max-w-xl px-2 text-center text-sm leading-relaxed text-on-surface-variant sm:px-0 sm:text-left">
+          <p className="mx-auto max-w-xl px-2 text-center text-sm leading-relaxed text-[#555] sm:px-0 sm:text-left">
             Completa 1º y 2º en cada grupo para generar el cuadro.
           </p>
         ) : (
-        <div className="glass-panel rounded-2xl p-3 md:p-5 w-full max-w-full min-w-0 overflow-x-auto overscroll-x-contain">
+        <div className="rounded-2xl border border-[#dedede] bg-white p-3 md:p-5 w-full max-w-full min-w-0 overflow-x-auto overscroll-x-contain shadow-sm">
           <div
             ref={bracketViewportRef}
-            className="relative flex min-w-0 w-full max-w-full justify-start"
+            className="relative flex min-w-0 w-full max-w-full justify-center"
             style={{
               minHeight: bracketCaptureH * bracketScale,
             }}
           >
             <div
-              ref={captureRef}
-              data-bracket-capture=""
-              className="absolute left-0 top-0 box-border bg-primary-container/60 rounded-xl p-3 md:p-5"
+              className="relative mx-auto shrink-0"
               style={{
-                width: BRACKET_CAPTURE_WIDTH_PX,
-                transform: `scale(${bracketScale})`,
-                transformOrigin: "top left",
+                width: BRACKET_CAPTURE_WIDTH_PX * bracketScale,
+                height: bracketCaptureH * bracketScale,
               }}
             >
+              <div
+                ref={captureRef}
+                data-bracket-capture=""
+                className="absolute left-0 top-0 box-border bg-[#f0f2f5] rounded-xl p-3 md:p-5"
+                style={{
+                  width: BRACKET_CAPTURE_WIDTH_PX,
+                  transform: `scale(${bracketScale})`,
+                  transformOrigin: "top left",
+                }}
+              >
             <div className="flex items-center justify-between mb-4">
-              <p className="text-label-caps text-secondary tracking-widest">MUNDIAL 2026</p>
-              <p className="text-label-caps text-on-surface-variant">{userName}</p>
+              <p className="text-label-caps text-[#0070ef] tracking-widest">MUNDIAL 2026</p>
+              <p className="text-label-caps text-[#878787]">{userName}</p>
             </div>
 
             <MirroredBracket
@@ -475,7 +489,7 @@ export function BracketSimulator({ predictions, isLocked, userName = "Jugador" }
               locked={isLocked}
             />
 
-            <div className="mt-4 flex flex-col gap-1 border-t border-white/5 pt-3 text-[10px] text-on-surface-variant sm:flex-row sm:items-center sm:justify-between sm:gap-3">
+            <div className="mt-4 flex flex-col gap-1 border-t border-[#dedede] pt-3 text-[10px] text-[#878787] sm:flex-row sm:items-center sm:justify-between sm:gap-3">
               <span className="min-w-0 truncate text-center sm:flex-1 sm:text-left">
                 {userName}
               </span>
@@ -486,14 +500,7 @@ export function BracketSimulator({ predictions, isLocked, userName = "Jugador" }
               ) : null}
             </div>
           </div>
-            <div
-              aria-hidden
-              className="pointer-events-none shrink-0"
-              style={{
-                width: BRACKET_CAPTURE_WIDTH_PX * bracketScale,
-                height: bracketCaptureH * bracketScale,
-              }}
-            />
+            </div>
           </div>
         </div>
         )}
@@ -515,9 +522,27 @@ interface BracketViewProps {
   locked: boolean;
 }
 
-/* -------------------------------------------------------------------------- */
-/*  Desktop — mirrored tree                                                    */
-/* -------------------------------------------------------------------------- */
+function BracketColHeading({
+  name,
+  fraction,
+  align,
+}: {
+  name: string;
+  fraction: string;
+  align: "left" | "right";
+}) {
+  return (
+    <span
+      className={clsx(
+        "flex-1 min-w-[82px] flex flex-col justify-center gap-0 text-[8px] sm:text-[9px] font-semibold leading-[1.15] text-[#555]",
+        align === "left" ? "text-left items-start" : "text-right items-end"
+      )}
+    >
+      <span>{name}</span>
+      <span className="font-medium text-[#878787]">{fraction}</span>
+    </span>
+  );
+}
 
 function MirroredBracket({ bracket, picks, onPick, locked }: BracketViewProps) {
   const final = bracket.final[0];
@@ -525,57 +550,34 @@ function MirroredBracket({ bracket, picks, onPick, locked }: BracketViewProps) {
 
   return (
     <div className="block">
-      {/* Column headers — widths mirror the bracket columns below */}
-      <div className="mb-1.5 flex items-center text-[10px] font-semibold uppercase tracking-wide text-on-surface-variant">
-        <span className="flex-1 min-w-[82px] text-left">1/16</span>
+      <div className="mb-1.5 flex min-h-[2.35rem] items-stretch">
+        <BracketColHeading name="Dieciseisavos" fraction="(1/16)" align="left" />
         <span className="w-1.5 shrink-0" />
-        <span className="flex-1 min-w-[82px] text-left">Octavos</span>
+        <BracketColHeading name="Octavos" fraction="(1/8)" align="left" />
         <span className="w-1.5 shrink-0" />
-        <span className="flex-1 min-w-[82px] text-left">Cuartos</span>
+        <BracketColHeading name="Cuartos" fraction="(1/4)" align="left" />
         <span className="w-1.5 shrink-0" />
-        <span className="flex-1 min-w-[82px] text-left">Semis</span>
-        <span className="w-[182px] shrink-0 text-center text-secondary">Final</span>
-        <span className="flex-1 min-w-[82px] text-right">Semis</span>
+        <BracketColHeading name="Semifinal" fraction="(1/2)" align="left" />
+        <span className="w-[182px] shrink-0 text-center text-[10px] font-bold leading-tight text-[#0070ef] flex flex-col justify-center">
+          Final
+        </span>
+        <BracketColHeading name="Semifinal" fraction="(1/2)" align="right" />
         <span className="w-1.5 shrink-0" />
-        <span className="flex-1 min-w-[82px] text-right">Cuartos</span>
+        <BracketColHeading name="Cuartos" fraction="(1/4)" align="right" />
         <span className="w-1.5 shrink-0" />
-        <span className="flex-1 min-w-[82px] text-right">Octavos</span>
+        <BracketColHeading name="Octavos" fraction="(1/8)" align="right" />
         <span className="w-1.5 shrink-0" />
-        <span className="flex-1 min-w-[82px] text-right">1/16</span>
+        <BracketColHeading name="Dieciseisavos" fraction="(1/16)" align="right" />
       </div>
 
       <div className="flex min-w-0" style={{ height: 760 }}>
-        <BracketRound
-          matches={bracket.r32.slice(0, 8)}
-          picks={picks}
-          onPick={onPick}
-          locked={locked}
-          side="left"
-        />
+        <BracketRound matches={bracket.r32.slice(0, 8)} picks={picks} onPick={onPick} locked={locked} side="left" />
         <BracketConnectors count={4} side="right" />
-        <BracketRound
-          matches={bracket.r16.slice(0, 4)}
-          picks={picks}
-          onPick={onPick}
-          locked={locked}
-          side="left"
-        />
+        <BracketRound matches={bracket.r16.slice(0, 4)} picks={picks} onPick={onPick} locked={locked} side="left" />
         <BracketConnectors count={2} side="right" />
-        <BracketRound
-          matches={bracket.qf.slice(0, 2)}
-          picks={picks}
-          onPick={onPick}
-          locked={locked}
-          side="left"
-        />
+        <BracketRound matches={bracket.qf.slice(0, 2)} picks={picks} onPick={onPick} locked={locked} side="left" />
         <BracketConnectors count={1} side="right" />
-        <BracketRound
-          matches={[bracket.sf[0]]}
-          picks={picks}
-          onPick={onPick}
-          locked={locked}
-          side="left"
-        />
+        <BracketRound matches={[bracket.sf[0]]} picks={picks} onPick={onPick} locked={locked} side="left" />
 
         <div className="w-[182px] shrink-0 px-1 flex flex-col items-center justify-center gap-2">
           <MatchCard
@@ -590,37 +592,13 @@ function MirroredBracket({ bracket, picks, onPick, locked }: BracketViewProps) {
           <ChampionTile champion={champion} compact />
         </div>
 
-        <BracketRound
-          matches={[bracket.sf[1]]}
-          picks={picks}
-          onPick={onPick}
-          locked={locked}
-          side="right"
-        />
+        <BracketRound matches={[bracket.sf[1]]} picks={picks} onPick={onPick} locked={locked} side="right" />
         <BracketConnectors count={1} side="left" />
-        <BracketRound
-          matches={bracket.qf.slice(2, 4)}
-          picks={picks}
-          onPick={onPick}
-          locked={locked}
-          side="right"
-        />
+        <BracketRound matches={bracket.qf.slice(2, 4)} picks={picks} onPick={onPick} locked={locked} side="right" />
         <BracketConnectors count={2} side="left" />
-        <BracketRound
-          matches={bracket.r16.slice(4, 8)}
-          picks={picks}
-          onPick={onPick}
-          locked={locked}
-          side="right"
-        />
+        <BracketRound matches={bracket.r16.slice(4, 8)} picks={picks} onPick={onPick} locked={locked} side="right" />
         <BracketConnectors count={4} side="left" />
-        <BracketRound
-          matches={bracket.r32.slice(8, 16)}
-          picks={picks}
-          onPick={onPick}
-          locked={locked}
-          side="right"
-        />
+        <BracketRound matches={bracket.r32.slice(8, 16)} picks={picks} onPick={onPick} locked={locked} side="right" />
       </div>
     </div>
   );
@@ -656,7 +634,7 @@ function BracketRound({ matches, picks, onPick, locked, side }: BracketRoundProp
 
 function BracketConnectors({ count, side }: { count: number; side: "left" | "right" }) {
   const br = side === "right" ? "border-r" : "border-l";
-  const lineColor = "border-white/45";
+  const lineColor = "border-[#dedede]";
   return (
     <div className="w-1.5 shrink-0 flex flex-col">
       {Array.from({ length: count }).map((_, i) => (
@@ -675,29 +653,25 @@ function ChampionTile({ champion, compact }: { champion: string | null; compact?
   return (
     <div
       className={clsx(
-        "w-full rounded-lg border border-secondary/30 bg-secondary/10 text-center",
+        "w-full rounded-lg border border-[#80c7a0] bg-[#d8f5e6] text-center",
         compact ? "p-2" : "p-4"
       )}
     >
-      <Trophy className={clsx("mx-auto text-secondary", compact ? "h-6 w-6" : "h-8 w-8")} />
-      <p className="mt-1 text-[10px] font-semibold uppercase tracking-widest text-secondary">Campeón</p>
+      <Trophy className={clsx("mx-auto text-[#3d8b5e]", compact ? "h-6 w-6" : "h-8 w-8")} />
+      <p className="mt-1 text-[10px] font-semibold uppercase tracking-widest text-[#3d8b5e]">Campeón</p>
       {champion ? (
         <div className="mt-2 inline-flex items-center gap-2">
           <Flag code={champion} size="sm" />
-          <span className="font-headline-sm text-headline-sm text-on-background">
+          <span className="font-headline-sm text-headline-sm text-[#1a1a2e]">
             {TEAM_SHORT[champion]}
           </span>
         </div>
       ) : (
-        <p className="mt-2 text-on-surface-variant text-sm">Por definir</p>
+        <p className="mt-2 text-[#878787] text-sm">Por definir</p>
       )}
     </div>
   );
 }
-
-/* -------------------------------------------------------------------------- */
-/*  Reusable match card                                                        */
-/* -------------------------------------------------------------------------- */
 
 interface MatchCardProps {
   matchId: string;
@@ -721,15 +695,15 @@ function MatchCard({
   side,
 }: MatchCardProps) {
   const rowClasses =
-    "w-full rounded-md px-1.5 py-1 text-[11px] leading-tight flex items-center gap-1.5 border transition";
+    "w-full rounded-md px-1.5 py-1 text-[11px] leading-tight flex items-center gap-1.5 border transition-colors duration-150";
 
   return (
     <div
       className={clsx(
-        "rounded-lg border bg-surface-container p-1.5 space-y-1",
+        "rounded-lg border bg-white p-1.5 space-y-1",
         emphasized
-          ? "border-secondary/30 shadow-[0_0_24px_rgba(255,185,85,0.15)]"
-          : "border-white/10",
+          ? "border-[#0070ef] shadow-[0_0_12px_rgba(0,112,239,0.12)]"
+          : "border-[#dedede]",
         side === "left" && "bracket-stub-right",
         side === "right" && "bracket-stub-left"
       )}
@@ -741,7 +715,7 @@ function MatchCard({
               key={idx}
               className={clsx(
                 rowClasses,
-                "border-white/15 bg-slate-500/20 text-transparent select-none"
+                "border-[#dedede] bg-[#f8f9fa] text-transparent select-none"
               )}
             >
               <span className="opacity-0">placeholder</span>
@@ -758,13 +732,13 @@ function MatchCard({
             className={clsx(
               rowClasses,
               isWinner
-                ? "border-secondary/40 bg-secondary/10 text-secondary"
-                : "border-white/10 text-on-surface hover:border-secondary/30"
+                ? "border-[#0070ef] bg-[#e0efff] text-[#004c84]"
+                : "border-[#dedede] text-[#1a1a2e] hover:border-[#0070ef]/40 hover:bg-[#e0efff]/30"
             )}
           >
             <Flag code={team} size="sm" />
-            <span className="font-medium truncate">{TEAM_SHORT[team]}</span>
-            {isWinner && <CheckCircle2 className="h-3.5 w-3.5 ml-auto shrink-0" />}
+            <span className="font-medium whitespace-nowrap">{TEAM_SHORT[team]}</span>
+            {isWinner && <CheckCircle2 className="h-3.5 w-3.5 ml-auto shrink-0 text-[#0070ef]" />}
           </button>
         );
       })}

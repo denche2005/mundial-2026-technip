@@ -1,32 +1,6 @@
 import type { Metadata, Viewport } from "next";
-import {
-  Archivo_Narrow,
-  Hanken_Grotesk,
-  JetBrains_Mono,
-} from "next/font/google";
 import "./globals.css";
 import { ServiceWorkerRegister } from "@/components/service-worker-register";
-
-const archivoNarrow = Archivo_Narrow({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-archivo-narrow",
-  display: "swap",
-});
-
-const hanken = Hanken_Grotesk({
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
-  variable: "--font-hanken",
-  display: "swap",
-});
-
-const jetbrains = JetBrains_Mono({
-  subsets: ["latin"],
-  weight: ["400", "500", "700"],
-  variable: "--font-jetbrains",
-  display: "swap",
-});
 
 export const metadata: Metadata = {
   title: "Porra Technip — Mundial 2026",
@@ -43,7 +17,7 @@ export const metadata: Metadata = {
   },
   appleWebApp: {
     capable: true,
-    statusBarStyle: "black-translucent",
+    statusBarStyle: "default",
     title: "Technip 2026",
   },
   openGraph: {
@@ -55,7 +29,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#111412",
+  themeColor: "#0070EF",
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
@@ -67,10 +41,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html
-      lang="es"
-      className={`dark ${archivoNarrow.variable} ${hanken.variable} ${jetbrains.variable}`}
-    >
+    <html lang="es">
       <body className="min-h-screen bg-background text-on-background antialiased">
         <ServiceWorkerRegister />
         {children}

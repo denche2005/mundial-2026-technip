@@ -1,9 +1,5 @@
 import Link from "next/link";
 
-/**
- * Inline Goal icon — avoids importing lucide from server routes (fixes flaky
- * `.next/server/... Missing chunk xxx.js` on pages that only compose AuthShell).
- */
 function GoalIcon({ className }: { className?: string }) {
   return (
     <svg
@@ -24,35 +20,29 @@ function GoalIcon({ className }: { className?: string }) {
   );
 }
 
-/**
- * Shared chrome for /login and /register: MUNDIAL 2026 top bar + landing-style footer.
- */
 export function AuthShell({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex min-h-[100dvh] flex-col bg-[#0B101B] text-on-background">
-      <header className="sticky top-0 z-20 border-b border-white/10 bg-[#0B101B]/95 backdrop-blur-xl">
+    <div className="flex min-h-[100dvh] flex-col bg-[#f8f9fa] text-[#1a1a2e]">
+      <header className="sticky top-0 z-20 border-b border-[#dedede] bg-white shadow-sm">
         <div className="mx-auto flex h-16 w-full max-w-lg items-center justify-center gap-2 px-4">
-          <GoalIcon className="h-6 w-6 text-secondary shrink-0" />
-          <span className="font-headline text-headline-md font-bold tracking-tight text-secondary italic">
-            MUNDIAL 2026
-          </span>
+          <img src="/logo.png" alt="Technip Energies" className="h-8 w-auto" />
         </div>
       </header>
 
       <div className="flex flex-1 flex-col px-4 pb-8 pt-6 md:pt-8">{children}</div>
 
-      <footer className="border-t border-white/10 py-6">
-        <p className="text-center text-[11px] text-on-surface-variant">
-          © {new Date().getFullYear()} LA PORRA — EL RITMO DEL FÚTBOL
+      <footer className="border-t border-[#dedede] bg-white py-6">
+        <p className="text-center text-[11px] text-[#878787]">
+          &copy; {new Date().getFullYear()} Technip Energies &mdash; Porra Mundial 2026
         </p>
-        <nav className="mt-3 flex flex-wrap items-center justify-center gap-4 text-xs text-on-surface-variant">
-          <Link href="#" className="transition-colors hover:text-secondary">
+        <nav className="mt-3 flex flex-wrap items-center justify-center gap-4 text-xs text-[#878787]">
+          <Link href="#" className="transition-colors hover:text-[#0070ef]">
             Privacy
           </Link>
-          <Link href="#" className="transition-colors hover:text-secondary">
+          <Link href="#" className="transition-colors hover:text-[#0070ef]">
             Terms
           </Link>
-          <Link href="#" className="transition-colors hover:text-secondary">
+          <Link href="#" className="transition-colors hover:text-[#0070ef]">
             Support
           </Link>
         </nav>

@@ -1,6 +1,6 @@
 -- Configuración del torneo + cuadro oficial + predicciones de usuario.
 
-create table public.tournament_config (
+create table if not exists public.tournament_config (
   id integer primary key default 1 check (id = 1),
   tournament_start_at timestamptz not null default '2026-06-11T00:00:00Z',
   created_at timestamptz not null default now()
@@ -10,7 +10,7 @@ insert into public.tournament_config (tournament_start_at)
 values ('2026-06-11T00:00:00Z')
 on conflict (id) do nothing;
 
-create table public.bracket_predictions (
+create table if not exists public.bracket_predictions (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references public.profiles(id) on delete cascade,
   round text not null check (round in ('r32', 'r16', 'qf', 'sf', 'final', 'champion')),
@@ -21,7 +21,7 @@ create table public.bracket_predictions (
   unique (user_id, round, position)
 );
 
-create table public.bracket_results (
+create table if not exists public.bracket_results (
   id uuid primary key default gen_random_uuid(),
   round text not null check (round in ('r32', 'r16', 'qf', 'sf', 'final', 'champion')),
   position integer not null,

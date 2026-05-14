@@ -43,22 +43,14 @@ export default async function AdminBracketPage() {
   }));
 
   return (
-    <div className="relative min-h-[calc(100vh-4rem)] bg-primary-container px-container-margin py-porra-lg md:py-porra-xl">
-      <div
-        className="pointer-events-none absolute inset-0 bg-cover bg-center opacity-10"
-        style={{
-          backgroundImage:
-            "url(https://images.unsplash.com/photo-1518091043644-c1d4457512c6?w=1600&q=80)",
-        }}
-      />
-
+    <div className="relative min-h-[calc(100vh-4rem)] bg-[#f8f9fa] px-container-margin py-porra-lg md:py-porra-xl">
       <div className="relative mx-auto max-w-6xl space-y-porra-lg">
-        <section className="rounded-xl border border-white/10 bg-surface-container p-porra-md md:p-porra-lg">
+        <section className="rounded-xl border border-[#dedede] bg-white p-porra-md md:p-porra-lg shadow-sm">
           <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
             <div className="space-y-2 max-w-2xl">
-              <p className="font-label-caps text-label-caps text-secondary">Panel admin</p>
-              <h1 className="font-display-lg text-display-lg text-on-surface">Bracket oficial</h1>
-              <p className="text-body-md text-on-surface-variant">
+              <p className="text-[10px] font-bold tracking-widest text-[#ee7766] uppercase">Panel admin</p>
+              <h1 className="text-3xl font-bold text-[#004c84]">Bracket oficial</h1>
+              <p className="text-sm text-[#555]">
                 Selecciona quién avanza por ronda y fija el campeón oficial. Alimenta el ranking de la porra interna.
               </p>
             </div>
