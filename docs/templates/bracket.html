@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Road to the Final</title>
+<style>
+.hide-scrollbar::-webkit-scrollbar { display: none; }
+.hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+.bracket-connector-right { position: relative; }
+.bracket-connector-right::after {
+  content: '';
+  position: absolute;
+  right: -12px;
+  top: 50%;
+  width: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+</style>
+</head>
+<body class="bg-primary-container text-on-background antialiased overflow-x-hidden min-h-screen flex flex-col">
+<header class="fixed top-0 left-0 w-full z-50 flex items-center justify-between px-container-margin h-16 bg-background/80 backdrop-blur-xl border-b border-white/10">
+<button class="text-secondary hover:opacity-80 p-2 -ml-2 rounded-full"><span class="material-symbols-outlined">menu</span></button>
+<h1 class="font-headline-lg text-headline-lg font-bold tracking-tight text-secondary">MUNDIAL 2026</h1>
+<div class="w-8 h-8 rounded-full bg-surface-container-high border border-white/10 overflow-hidden cursor-pointer hover:opacity-80"><img alt="User" class="w-full h-full object-cover" src=""/></div>
+</header>
+<main class="flex-grow pt-24 pb-32 px-container-margin lg:px-xl flex flex-col relative">
+<div class="absolute inset-0 z-0 pointer-events-none opacity-20 bg-cover bg-center mix-blend-overlay" style="background-image: url('STADIUM_HERO');"></div>
+<div class="relative z-10 flex flex-col h-full max-w-7xl mx-auto w-full">
+<div class="mb-lg text-center md:text-left">
+<h2 class="font-display-lg text-display-lg text-on-surface mb-xs drop-shadow-md">Road to the Final</h2>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-2xl">Select the winners to complete your tournament tree. Lock in your predictions before the knockout stage begins.</p>
+</div>
+<div class="w-full overflow-x-auto hide-scrollbar pb-md flex-grow">
+<div class="flex items-center gap-xl min-w-max px-sm py-sm h-full" style="min-height: 500px;">
+<!-- Quarter Finals -->
+<div class="flex flex-col justify-around gap-lg h-full w-48">
+<div class="bg-surface-container/80 backdrop-blur-md rounded-lg border border-white/5 p-xs shadow-lg flex flex-col gap-px bracket-connector-right">
+<div class="font-label-caps text-label-caps text-on-surface-variant px-sm py-1 opacity-70">Quarter Final 1</div>
+<div class="flex items-center justify-between p-sm rounded-md bg-secondary/10 border border-secondary/30 text-secondary cursor-pointer">
+<div class="flex items-center gap-sm">
+<img alt="FRA" class="w-6 h-4 rounded-sm" src=""/>
+<span class="font-headline-sm text-headline-sm">FRA</span>
+</div>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<div class="flex items-center justify-between p-sm rounded-md hover:bg-white/5 cursor-pointer text-on-surface">
+<div class="flex items-center gap-sm">
+<img alt="GER" class="w-6 h-4 rounded-sm" src=""/>
+<span class="font-body-md text-body-md">GER</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Semi Final -->
+<div class="flex flex-col justify-around gap-[calc(theme(spacing.lg)*3)] h-full w-48 relative">
+<div class="bg-surface-container/90 backdrop-blur-xl rounded-lg border border-white/10 p-xs shadow-xl flex flex-col gap-px relative">
+<div class="font-label-caps text-label-caps text-secondary px-sm py-1 flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]">local_fire_department</span> Semi Final 1
+</div>
+<div class="flex items-center justify-between p-sm rounded-md hover:bg-white/5 cursor-pointer text-on-surface">
+<div class="flex items-center gap-sm"><img alt="" class="w-6 h-4 rounded-sm opacity-50" src=""/><span class="font-body-md opacity-50">FRA</span></div>
+</div>
+<div class="flex items-center justify-between p-sm rounded-md bg-white/5 border border-white/10 text-on-surface cursor-pointer">
+<div class="flex items-center gap-sm"><img alt="" class="w-6 h-4 rounded-sm opacity-50" src=""/><span class="font-body-md opacity-50">BRA</span></div>
+<span class="text-xs text-on-surface-variant">Tap to Pick</span>
+</div>
+</div>
+</div>
+<!-- Final -->
+<div class="flex flex-col justify-center h-full w-56 relative">
+<div class="bg-surface-container-high/90 backdrop-blur-2xl rounded-xl border border-secondary/30 p-sm shadow-[0_0_30px_rgba(255,185,85,0.1)] flex flex-col gap-xs relative transform scale-105">
+<div class="text-center pb-2 border-b border-white/5">
+<span class="font-label-caps text-label-caps text-secondary tracking-widest">THE FINAL</span>
+</div>
+<div class="flex items-center justify-between p-sm rounded-md bg-black/20 cursor-pointer text-on-surface-variant border border-dashed border-white/10 mt-2">
+<div class="flex items-center gap-sm"><div class="w-6 h-4 bg-surface-dim rounded-sm"></div><span class="font-data-mono">TBD</span></div>
+</div>
+<div class="flex items-center justify-between p-sm rounded-md bg-black/20 cursor-pointer text-on-surface-variant border border-dashed border-white/10 mt-1">
+<div class="flex items-center gap-sm"><div class="w-6 h-4 bg-surface-dim rounded-sm"></div><span class="font-data-mono">TBD</span></div>
+</div>
+</div>
+</div>
+<!-- Champion Trophy -->
+<div class="flex flex-col justify-center items-center h-full w-48 pl-lg">
+<div class="w-24 h-24 rounded-full bg-surface-container border border-secondary/20 flex items-center justify-center shadow-[0_0_40px_rgba(255,185,85,0.15)]">
+<span class="material-symbols-outlined text-[48px] text-secondary opacity-50" style="font-variation-settings: 'FILL' 1;">trophy</span>
+</div>
+<div class="mt-sm font-headline-sm text-headline-sm text-secondary opacity-50 text-center">Champion</div>
+</div>
+</div>
+</div>
+<div class="mt-auto pt-lg pb-md flex justify-center w-full">
+<button class="bg-secondary text-on-secondary font-headline-md text-headline-md px-xl py-md rounded-xl shadow-[0_0_24px_rgba(255,185,85,0.4)] flex items-center justify-center gap-sm w-full max-w-sm hover:scale-[1.02] active:scale-95 transition-all">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">share</span>
+Share My Bracket
+</button>
+</div>
+</div>
+</main>
+</body></html>

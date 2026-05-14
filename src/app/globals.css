@@ -1,0 +1,496 @@
+@import "tailwindcss";
+
+/* ---------------------------------------------------------------------------
+   Mundial 2026 design tokens — dark-mode only, inspired by a stadium at night.
+   Token names mirror the Material 3 vocabulary the Stitch templates use so we
+   can paste the templates' utility classes (`bg-secondary`, `text-on-surface`,
+   `font-headline-lg`, `text-display-lg`, `font-label-caps`, …) verbatim.
+--------------------------------------------------------------------------- */
+@theme {
+  /* ===== Surfaces ===== */
+  --color-background: var(--theme-background, #111412);
+  --color-on-background: var(--theme-on-background, #e2e3df);
+  --color-surface: var(--theme-surface, #111412);
+  --color-surface-dim: #111412;
+  --color-surface-bright: #373a37;
+  --color-surface-container-lowest: #0c0f0d;
+  --color-surface-container-low: #1a1c1a;
+  --color-surface-container: #1e201e;
+  --color-surface-container-high: #282b28;
+  --color-surface-container-highest: #333533;
+  --color-surface-variant: #333533;
+  --color-on-surface: #e2e3df;
+  --color-on-surface-variant: #c4c6cc;
+  --color-outline: #8e9196;
+  --color-outline-variant: #44474c;
+  --color-inverse-surface: #e2e3df;
+  --color-inverse-on-surface: #2f312e;
+
+  /* ===== Brand ===== */
+  --color-primary: var(--theme-primary, #bac8dc);
+  --color-on-primary: var(--theme-on-primary, #243141);
+  --color-primary-container: var(--theme-primary-container, #0d1b2a);
+  --color-on-primary-container: var(--theme-on-primary-container, #768497);
+  --color-secondary: var(--theme-secondary, #ffb955);
+  --color-on-secondary: var(--theme-on-secondary, #452b00);
+  --color-secondary-container: var(--theme-secondary-container, #dc9100);
+  --color-on-secondary-container: var(--theme-on-secondary-container, #4f3100);
+  --color-tertiary: var(--theme-tertiary, #59de9b);
+  --color-on-tertiary: var(--theme-on-tertiary, #003921);
+  --color-tertiary-container: var(--theme-tertiary-container, #001f10);
+  --color-on-tertiary-container: var(--theme-on-tertiary-container, #00955f);
+  --color-error: var(--theme-error, #ffb4ab);
+  --color-on-error: var(--theme-on-error, #690005);
+  --color-error-container: var(--theme-error-container, #93000a);
+  --color-on-error-container: var(--theme-on-error-container, #ffdad6);
+
+  /* ===== Legacy compat (admin / score-input still reference these) ===== */
+  --color-primary-50: #fff8e6;
+  --color-primary-100: #ffeab2;
+  --color-primary-200: #ffd680;
+  --color-primary-300: #ffc257;
+  --color-primary-400: #ffb955;
+  --color-primary-500: #ffb955;
+  --color-primary-600: #dc9100;
+  --color-primary-700: #b87800;
+  --color-primary-800: #855500;
+  --color-primary-900: #4f3100;
+  --color-success: #59de9b;
+  --color-warning: #ffb955;
+
+  /* ===== Layout spacing — use --spacing-porra-* so we do NOT override Tailwind's
+      --spacing-{xs,sm,md,lg,xl}, which Tailwind v4 maps to max-w-{sm,md,Lg,...}
+      (e.g. max-w-md would become 16px if --spacing-md is 16px). ===== */
+  --spacing-porra-xs: 4px;
+  --spacing-porra-sm: 8px;
+  --spacing-porra-md: 16px;
+  --spacing-porra-lg: 24px;
+  --spacing-porra-xl: 40px;
+  --spacing-container-margin: 20px;
+  --spacing-gutter: 16px;
+
+  /* ===== Radii ===== */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+
+  /* ===== Font families — wired from next/font css variables in layout.tsx === */
+  --font-sans: var(--font-hanken), "Hanken Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-archivo-narrow), "Archivo Narrow", ui-sans-serif, system-ui, sans-serif;
+  --font-headline: var(--font-archivo-narrow), "Archivo Narrow", ui-sans-serif, system-ui, sans-serif;
+  --font-body: var(--font-hanken), "Hanken Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), "JetBrains Mono", ui-monospace, monospace;
+
+  /* Stitch-style font-family aliases used by templates */
+  --font-display-lg: var(--font-archivo-narrow), "Archivo Narrow", ui-sans-serif, system-ui, sans-serif;
+  --font-headline-lg: var(--font-archivo-narrow), "Archivo Narrow", ui-sans-serif, system-ui, sans-serif;
+  --font-headline-md: var(--font-archivo-narrow), "Archivo Narrow", ui-sans-serif, system-ui, sans-serif;
+  --font-headline-sm: var(--font-archivo-narrow), "Archivo Narrow", ui-sans-serif, system-ui, sans-serif;
+  --font-body-lg: var(--font-hanken), "Hanken Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-body-md: var(--font-hanken), "Hanken Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-data-mono: var(--font-jetbrains), "JetBrains Mono", ui-monospace, monospace;
+  --font-label-caps: var(--font-hanken), "Hanken Grotesk", ui-sans-serif, system-ui, sans-serif;
+
+  /* ===== Type scale (font-size + line-height + letter-spacing) ===== */
+  --text-display-lg: 48px;
+  --text-display-lg--line-height: 1.1;
+  --text-display-lg--letter-spacing: -0.02em;
+  --text-display-lg--font-weight: 700;
+
+  --text-headline-lg: 32px;
+  --text-headline-lg--line-height: 1.2;
+  --text-headline-lg--font-weight: 700;
+
+  --text-headline-md: 24px;
+  --text-headline-md--line-height: 1.2;
+  --text-headline-md--font-weight: 600;
+
+  --text-headline-sm: 20px;
+  --text-headline-sm--line-height: 1.2;
+  --text-headline-sm--font-weight: 600;
+
+  --text-body-lg: 18px;
+  --text-body-lg--line-height: 1.6;
+
+  --text-body-md: 16px;
+  --text-body-md--line-height: 1.5;
+
+  --text-data-mono: 14px;
+  --text-data-mono--line-height: 1.4;
+  --text-data-mono--letter-spacing: 0.05em;
+
+  --text-label-caps: 12px;
+  --text-label-caps--line-height: 1.2;
+  --text-label-caps--letter-spacing: 0.1em;
+  --text-label-caps--font-weight: 700;
+}
+
+/* ---------------------------------------------------------------------------
+   Base — body defaults, typography normalisation, scrollbar tweaks.
+--------------------------------------------------------------------------- */
+@layer base {
+  html {
+    color-scheme: dark;
+    background-color: var(--color-background);
+  }
+
+  body {
+    background-color: var(--color-background);
+    background-image:
+      radial-gradient(ellipse 80% 50% at 15% 10%, rgba(255, 185, 85, 0.07) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 85% 80%, rgba(89, 222, 155, 0.05) 0%, transparent 55%),
+      radial-gradient(ellipse 50% 60% at 50% 50%, rgba(27, 38, 59, 0.6) 0%, transparent 80%);
+    background-attachment: fixed;
+    color: var(--color-on-background);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* label-caps is uppercase in Stitch — apply globally so font-label-caps
+     and text-label-caps both render in caps without extra utility classes. */
+  .font-label-caps,
+  .text-label-caps {
+    text-transform: uppercase;
+  }
+
+  /* Hide native number-input spinners on score inputs */
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type="number"] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Theme definitions for World Cup 2026 Host Cities
+--------------------------------------------------------------------------- */
+@layer base {
+  :root {
+    /* Default (Gold / Classic) */
+    --theme-primary: #bac8dc;
+    --theme-on-primary: #243141;
+    --theme-secondary: #ffb955;
+    --theme-on-secondary: #452b00;
+    --theme-secondary-container: #dc9100;
+  }
+
+  /* ── FIFA World Cup 2026 Official Host City Colors ─────────────── */
+
+  [data-theme="atlanta"] {
+    --theme-secondary: #00C9C8;
+    --theme-on-secondary: #003333;
+    --theme-secondary-container: #009A99;
+    --theme-primary: #1B4D2E;
+    --theme-on-primary: #C8F0D8;
+  }
+
+  [data-theme="boston"] {
+    --theme-secondary: #F5A623;
+    --theme-on-secondary: #452b00;
+    --theme-secondary-container: #C08018;
+    --theme-primary: #1B4D2E;
+    --theme-on-primary: #C8F0D8;
+  }
+
+  [data-theme="dallas"] {
+    --theme-secondary: #AADD00;
+    --theme-on-secondary: #2A3700;
+    --theme-secondary-container: #7FAA00;
+    --theme-primary: #1B4D2E;
+    --theme-on-primary: #C8F0D8;
+  }
+
+  [data-theme="guadalajara"] {
+    --theme-secondary: #00C9A7;
+    --theme-on-secondary: #00332A;
+    --theme-secondary-container: #009A80;
+    --theme-primary: #FF1F8E;
+    --theme-on-primary: #ffffff;
+  }
+
+  [data-theme="houston"] {
+    --theme-secondary: #5B9BF5;
+    --theme-on-secondary: #0A1F40;
+    --theme-secondary-container: #3A7AD4;
+    --theme-primary: #1A3FAA;
+    --theme-on-primary: #D0DFFF;
+  }
+
+  [data-theme="kansas_city"] {
+    --theme-secondary: #FF4D6D;
+    --theme-on-secondary: #400010;
+    --theme-secondary-container: #D03050;
+    --theme-primary: #CC1230;
+    --theme-on-primary: #FFD0D6;
+  }
+
+  [data-theme="los_angeles"] {
+    --theme-secondary: #F0F060;
+    --theme-on-secondary: #3A3A00;
+    --theme-secondary-container: #C0C040;
+    --theme-primary: #CC1230;
+    --theme-on-primary: #FFD0D6;
+  }
+
+  [data-theme="mexico_city"] {
+    --theme-secondary: #F5A623;
+    --theme-on-secondary: #452b00;
+    --theme-secondary-container: #C08018;
+    --theme-primary: #8B2FC9;
+    --theme-on-primary: #F0D8FF;
+  }
+
+  [data-theme="miami"] {
+    --theme-secondary: #FF1F8E;
+    --theme-on-secondary: #400020;
+    --theme-secondary-container: #D0106E;
+    --theme-primary: #7DD8F0;
+    --theme-on-primary: #003040;
+  }
+
+  [data-theme="monterrey"] {
+    --theme-secondary: #00C9C8;
+    --theme-on-secondary: #003333;
+    --theme-secondary-container: #009A99;
+    --theme-primary: #6B2FC9;
+    --theme-on-primary: #E8D0FF;
+  }
+
+  [data-theme="new_york"] {
+    --theme-secondary: #2A4A8A;
+    --theme-on-secondary: #D0DFFF;
+    --theme-secondary-container: #1A3570;
+    --theme-primary: #1A2744;
+    --theme-on-primary: #D0DFFF;
+  }
+
+  [data-theme="philadelphia"] {
+    --theme-secondary: #9BA8D8;
+    --theme-on-secondary: #1A2744;
+    --theme-secondary-container: #7080B0;
+    --theme-primary: #1A2744;
+    --theme-on-primary: #D0DFFF;
+  }
+
+  [data-theme="san_francisco"] {
+    --theme-secondary: #CC2200;
+    --theme-on-secondary: #ffffff;
+    --theme-secondary-container: #991A00;
+    --theme-primary: #C8F0D0;
+    --theme-on-primary: #0A3010;
+  }
+
+  [data-theme="seattle"] {
+    --theme-secondary: #8A7A30;
+    --theme-on-secondary: #ffffff;
+    --theme-secondary-container: #6A5A20;
+    --theme-primary: #4A1F7A;
+    --theme-on-primary: #E0D0FF;
+  }
+
+  [data-theme="toronto"] {
+    --theme-secondary: #AADD00;
+    --theme-on-secondary: #2A3700;
+    --theme-secondary-container: #7FAA00;
+    --theme-primary: #1A3FAA;
+    --theme-on-primary: #D0DFFF;
+  }
+
+  [data-theme="vancouver"] {
+    --theme-secondary: #1B4D2E;
+    --theme-on-secondary: #C8F0D8;
+    --theme-secondary-container: #0F3A1E;
+    --theme-primary: #0D1F1F;
+    --theme-on-primary: #A0C0C0;
+  }
+}
+
+
+/* ---------------------------------------------------------------------------
+   Utilities — glass surfaces, glow states, scrollbar suppression, bracket
+   connectors, and a couple of legacy admin shortcuts.
+--------------------------------------------------------------------------- */
+@utility glass-panel {
+  background-color: rgba(27, 38, 59, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+@utility glass-active {
+  box-shadow: 0 0 18px rgba(255, 185, 85, 0.22);
+  border-color: rgba(255, 185, 85, 0.4);
+}
+
+@utility glass-saved {
+  box-shadow: 0 0 18px rgba(89, 222, 155, 0.22);
+  border-color: rgba(89, 222, 155, 0.4);
+}
+
+@utility glow-gold {
+  box-shadow: 0 0 20px rgba(255, 185, 85, 0.35);
+}
+
+@utility glow-emerald {
+  box-shadow: 0 0 20px rgba(89, 222, 155, 0.35);
+}
+
+@utility no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Bracket connector arms — used by the Stitch bracket template. */
+@utility bracket-connector-right {
+  position: relative;
+}
+
+.bracket-connector-right::after {
+  content: "";
+  position: absolute;
+  right: -18px;
+  top: 50%;
+  width: 18px;
+  border-top: 1px dashed rgba(255, 255, 255, 0.35);
+}
+
+@utility bracket-connector-left {
+  position: relative;
+}
+
+.bracket-connector-left::after {
+  content: "";
+  position: absolute;
+  left: -18px;
+  top: 50%;
+  width: 18px;
+  border-top: 1px dashed rgba(255, 255, 255, 0.35);
+}
+
+/* Small horizontal stubs from each match card to connector columns */
+.bracket-stub-right,
+.bracket-stub-left {
+  position: relative;
+}
+
+.bracket-stub-right::after {
+  content: "";
+  position: absolute;
+  right: -10px;
+  top: 50%;
+  width: 10px;
+  border-top: 1px dashed rgba(255, 255, 255, 0.45);
+}
+
+.bracket-stub-left::before {
+  content: "";
+  position: absolute;
+  left: -10px;
+  top: 50%;
+  width: 10px;
+  border-top: 1px dashed rgba(255, 255, 255, 0.45);
+}
+
+/* Legacy admin utilities — gold themed so they fit the dark palette. */
+@utility btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 0.75rem;
+  background-color: var(--color-secondary);
+  color: var(--color-on-secondary);
+  padding: 0.625rem 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  transition: filter 150ms ease, transform 150ms ease;
+}
+.btn-primary:hover { filter: brightness(1.05); }
+.btn-primary:active { transform: scale(0.97); }
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+@utility btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 0.75rem;
+  border: 1px solid var(--color-outline-variant);
+  background-color: transparent;
+  color: var(--color-on-surface);
+  padding: 0.625rem 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: background-color 150ms ease;
+}
+.btn-secondary:hover { background-color: rgba(255, 255, 255, 0.05); }
+
+@utility card {
+  border-radius: 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background-color: var(--color-surface-container);
+  padding: 1rem;
+  color: var(--color-on-surface);
+}
+
+@utility input-score {
+  width: 3rem;
+  height: 4rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background-color: var(--color-surface-container);
+  color: var(--color-secondary);
+  text-align: center;
+  font-family: var(--font-display);
+  font-size: 1.875rem;
+  font-weight: 700;
+  outline: none;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+.input-score::-webkit-outer-spin-button,
+.input-score::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.input-score:focus {
+  border-color: var(--color-secondary);
+  box-shadow: 0 0 0 3px rgba(255, 185, 85, 0.18);
+}
+.input-score:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ---------------------------------------------------------------------------
+   Landing page — scrolling flags ticker animation
+--------------------------------------------------------------------------- */
+@keyframes scroll-x {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-scroll-x {
+  animation: scroll-x 30s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-scroll-x {
+    animation: none;
+  }
+}

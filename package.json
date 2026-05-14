@@ -1,0 +1,45 @@
+{
+  "name": "mundial-2026-technip",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "scrape:fixtures": "tsx scripts/scrape-fifa-fixtures.ts",
+    "seed:matches": "tsx scripts/seed-matches.ts",
+    "audit:rls": "tsx --env-file=.env.local scripts/audit-rls.ts",
+    "test:rls": "tsx --env-file=.env.local scripts/test-rls.ts"
+  },
+  "dependencies": {
+    "@supabase/ssr": "^0",
+    "@supabase/supabase-js": "^2",
+    "clsx": "^2",
+    "html-to-image": "^1.11.13",
+    "lucide-react": "^0.500",
+    "next": "^15",
+    "react": "^19",
+    "react-dom": "^19"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3",
+    "@tailwindcss/postcss": "^4",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@types/node": "^22",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@vitejs/plugin-react": "^6.0.1",
+    "eslint": "^9",
+    "eslint-config-next": "^15",
+    "jsdom": "^29.1.1",
+    "postcss": "^8",
+    "tailwindcss": "^4",
+    "tsx": "^4",
+    "typescript": "^5",
+    "vitest": "^4.1.5"
+  }
+}

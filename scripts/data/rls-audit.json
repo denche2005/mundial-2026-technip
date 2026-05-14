@@ -1,0 +1,152 @@
+{
+  "generated_at": "2026-05-09T16:24:30.412Z",
+  "supabase_url": "https://asfqbotpdfloyxfzluup.supabase.co",
+  "source_priority": [
+    "live-probe",
+    "static"
+  ],
+  "tables": [
+    {
+      "table": "app_events",
+      "rls_enabled": true,
+      "rls_forced": null,
+      "policy_count": 0,
+      "policies": [],
+      "anon_can_read": true,
+      "source": "live-probe",
+      "recommendation": "CRITICAL: anon successfully read this table. RLS is either disabled or has a permissive SELECT policy. Verify in 015_rls_lockdown.sql."
+    },
+    {
+      "table": "bracket_predictions",
+      "rls_enabled": false,
+      "rls_forced": null,
+      "policy_count": 4,
+      "policies": [],
+      "anon_can_read": true,
+      "source": "live-probe",
+      "recommendation": "CRITICAL: anon successfully read this table. RLS is either disabled or has a permissive SELECT policy. Verify in 015_rls_lockdown.sql."
+    },
+    {
+      "table": "bracket_results",
+      "rls_enabled": false,
+      "rls_forced": null,
+      "policy_count": 2,
+      "policies": [],
+      "anon_can_read": true,
+      "source": "live-probe",
+      "recommendation": "CRITICAL: anon successfully read this table. RLS is either disabled or has a permissive SELECT policy. Verify in 015_rls_lockdown.sql."
+    },
+    {
+      "table": "group_invites",
+      "rls_enabled": false,
+      "rls_forced": null,
+      "policy_count": 0,
+      "policies": [],
+      "anon_can_read": true,
+      "source": "live-probe",
+      "recommendation": "CRITICAL: anon successfully read this table. RLS is either disabled or has a permissive SELECT policy. Verify in 015_rls_lockdown.sql."
+    },
+    {
+      "table": "group_members",
+      "rls_enabled": false,
+      "rls_forced": null,
+      "policy_count": 0,
+      "policies": [],
+      "anon_can_read": true,
+      "source": "live-probe",
+      "recommendation": "CRITICAL: anon successfully read this table. RLS is either disabled or has a permissive SELECT policy. Verify in 015_rls_lockdown.sql."
+    },
+    {
+      "table": "groups",
+      "rls_enabled": false,
+      "rls_forced": null,
+      "policy_count": 0,
+      "policies": [],
+      "anon_can_read": true,
+      "source": "live-probe",
+      "recommendation": "CRITICAL: anon successfully read this table. RLS is either disabled or has a permissive SELECT policy. Verify in 015_rls_lockdown.sql."
+    },
+    {
+      "table": "match_predictions",
+      "rls_enabled": false,
+      "rls_forced": null,
+      "policy_count": 3,
+      "policies": [],
+      "anon_can_read": true,
+      "source": "live-probe",
+      "recommendation": "CRITICAL: anon successfully read this table. RLS is either disabled or has a permissive SELECT policy. Verify in 015_rls_lockdown.sql."
+    },
+    {
+      "table": "matches",
+      "rls_enabled": false,
+      "rls_forced": null,
+      "policy_count": 4,
+      "policies": [],
+      "anon_can_read": true,
+      "source": "live-probe",
+      "recommendation": "CRITICAL: anon successfully read this table. RLS is either disabled or has a permissive SELECT policy. Verify in 015_rls_lockdown.sql."
+    },
+    {
+      "table": "profiles",
+      "rls_enabled": false,
+      "rls_forced": null,
+      "policy_count": 3,
+      "policies": [],
+      "anon_can_read": false,
+      "source": "live-probe",
+      "recommendation": "OK: anon was denied. Likely RLS-protected (or the table does not exist)."
+    },
+    {
+      "table": "tournament_config",
+      "rls_enabled": true,
+      "rls_forced": null,
+      "policy_count": 2,
+      "policies": [],
+      "anon_can_read": true,
+      "source": "live-probe",
+      "recommendation": "CRITICAL: anon successfully read this table. RLS is either disabled or has a permissive SELECT policy. Verify in 015_rls_lockdown.sql."
+    }
+  ],
+  "views": [
+    {
+      "view": "user_bracket_points",
+      "security_invoker": null,
+      "source": "static",
+      "note": "Static parse cannot tell `security_invoker` from migration files alone. Default in Postgres ≤ 14 is definer-equivalent. Run the live RPC for ground truth."
+    },
+    {
+      "view": "user_match_points",
+      "security_invoker": null,
+      "source": "static",
+      "note": "Static parse cannot tell `security_invoker` from migration files alone. Default in Postgres ≤ 14 is definer-equivalent. Run the live RPC for ground truth."
+    },
+    {
+      "view": "leaderboard_view",
+      "security_invoker": null,
+      "source": "static",
+      "note": "Static parse cannot tell `security_invoker` from migration files alone. Default in Postgres ≤ 14 is definer-equivalent. Run the live RPC for ground truth."
+    },
+    {
+      "view": "group_leaderboard_view",
+      "security_invoker": null,
+      "source": "static",
+      "note": "Static parse cannot tell `security_invoker` from migration files alone. Default in Postgres ≤ 14 is definer-equivalent. Run the live RPC for ground truth."
+    }
+  ],
+  "summary": {
+    "unrestricted_tables": [
+      "app_events",
+      "bracket_predictions",
+      "bracket_results",
+      "group_invites",
+      "group_members",
+      "groups",
+      "match_predictions",
+      "matches",
+      "profiles",
+      "tournament_config"
+    ],
+    "rls_without_policies": [],
+    "suspicious_views": []
+  }
+}
