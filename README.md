@@ -1,39 +1,101 @@
-# Mundial 2026 — Porra Technip (reducida)
+# Mundial 2026 — Porra Technip
 
-Fork interno: **landing**, **cuadro (bracket)**, **ranking global único**, **admin solo del bracket oficial** y **registro / login con email y contraseña** (hash en `profiles`, cookie `session_user`). Sin predicción de partidos, sin grupos privados, sin selector de tema ni admin de partidos.
+Porra interna: landing, registro/login, simulador de cuadro eliminatorio, ranking global y panel admin del bracket oficial.
 
-## Requisitos
+## Stack
 
-- Node.js 20+
-- Proyecto Supabase vacío (o dedicado a esta app)
+| Capa | Tecnología | Para qué |
+|------|------------|----------|
+| Framework | **Next.js 15** (App Router) | Rutas, SSR, Server Actions |
+| UI | **React 19** + **Tailwind CSS 4** | Componentes y estilos Technip |
+| Datos | **Supabase** (Postgres) | Perfiles, predicciones, resultados, vista de ranking |
+| Auth | Cookie `session_user` + hash en `profiles` | Login email/contraseña (sin OAuth en UI) |
+| Tests | **Vitest** | Lógica del bracket (`generateKnockout`, `stableThirds`) |
 
-## Configuración
+## Arrancar en local
 
-1. Copia `.env.local.example` a `.env.local` y rellena las variables de Supabase.
-2. En el proyecto Supabase, aplica las migraciones de `supabase/migrations/` en orden (`001` … `004`).
-3. Crea el **primer administrador**: en la tabla `profiles`, pon `role = 'admin'` al usuario que corresponda (tras su primer registro por la UI, o insertando la fila con el mismo `email` que usará).
+```powershell
+cd c:\Users\dcherednychenko\Documents\mundial-2026-technip
+copy .env.local.example .env.local
+# Edita .env.local con tus claves Supabase
 
-## Auth por email
-
-- **Registro** (`/register`): el servidor inserta en `profiles` con `email`, `full_name` y `password_hash` (PBKDF2). Tras el alta se establece la cookie `session_user`.
-- **Login** (`/login`): valida email + contraseña contra `password_hash` y establece la misma cookie.
-- No hay botón de Google en la UI; el callback en `/auth/callback` puede seguir existiendo por si en el futuro se usa Supabase Auth, pero el flujo MVP es solo email/contraseña.
-
-## Scripts
-
-```bash
 npm install
-npm run dev
-npm run build
+npm run verify:env
+
+# Red corporativa (certificado proxy): una de estas dos
+npm run dev:insecure-tls -- --port 3000
+# o: npm run dev
+
+# Si falla la caché de Next:
+npm run dev:fresh
 ```
 
-## Estructura relevante
+Abre **http://localhost:3000**
 
-- `src/app/app/simulador` — simulador de cuadro y guardado de predicciones.
-- `src/app/app/ranking` — clasificación global (solo puntos de bracket).
-- `src/app/app/admin/bracket` — panel admin del bracket oficial.
-- `src/app/app/reglas` — resumen de puntuación solo cuadro.
+- Landing: `/`
+- Login: `/login` · Registro: `/register`
+- App (requiere sesión): `/app/simulador` · `/app/ranking` · `/app/reglas`
+- Admin: `/app/admin/bracket` (usuario con `role = admin` en Supabase)
 
-## Repo remoto
+## Estructura del repo
 
-Origen GitHub previsto: `https://github.com/denche2005/mundial-2026-technip.git`
+```
+mundial-2026-technip/
+├── public/                 # Estáticos (logo, manifest, service worker)
+├── scripts/                # Utilidades (build deploy, TLS dev, probes)
+├── supabase/migrations/    # Esquema SQL (001–004)
+├── src/
+│   ├── app/                # Rutas Next (páginas y API)
+│   │   ├── page.tsx        # Landing pública
+│   │   ├── login/ register/
+│   │   ├── app/            # Zona autenticada
+│   │   │   ├── layout.tsx  # Barra superior + nav inferior
+│   │   │   ├── simulador/  # Cuadro + actions (guardar picks)
+│   │   │   ├── ranking/
+│   │   │   ├── reglas/
+│   │   │   └── admin/bracket/
+│   │   └── api/admin/bracket/  # API admin (opcional)
+│   ├── components/         # UI reutilizable
+│   │   ├── bracket-simulator.tsx   # Fase grupos + knockout
+│   │   ├── bracket-scoring-table.tsx
+│   │   ├── admin-bracket-panel.tsx
+│   │   ├── top-app-bar.tsx / side-drawer.tsx / bottom-nav.tsx
+│   │   └── ui/             # flag, save-indicator
+│   ├── actions/auth.ts     # login, registro, logout
+│   ├── lib/
+│   │   ├── session.ts      # Lee cookie de sesión
+│   │   ├── base-path.ts    # Prefijo /zip_mundial en deploy
+│   │   ├── bracket/        # Grupos, generación knockout, puntos
+│   │   └── supabase/       # Clientes server + service role
+│   └── middleware.ts       # Protege /app/*
+└── docs/RELEASE-CHECKLIST.md
+```
+
+### Dónde vive cada pieza
+
+- **Páginas** → `src/app/.../page.tsx` (una carpeta = una URL).
+- **Lógica de servidor** (guardar bracket, auth) → `actions.ts` junto a la página o `src/actions/`.
+- **Componentes grandes** → `src/components/` (simulador, tablas, shell).
+- **Reglas de negocio puras** (sin React) → `src/lib/bracket/`.
+- **Base de datos** → `supabase/migrations/`; puntos por ronda en función SQL `bracket_round_points`.
+
+## Despliegue (no es “solo copiar a wwwroot”)
+
+Esta app **no** es ASP.NET ni HTML estático. Es **Node.js** con `output: 'standalone'`.
+
+1. Build con variables de producción:
+   ```bash
+   set NEXT_PUBLIC_BASE_PATH=/zip_mundial
+   set NEXT_PUBLIC_SITE_URL=https://es001vs0062/zip_mundial
+   npm run build:deploy
+   ```
+2. Copia la carpeta generada **`dist/zip_mundial/`** al servidor (no el código fuente ni otra app MVC).
+3. En el servidor: `node server.js` en un puerto interno + **IIS ARR** haciendo proxy de `https://es001vs0062/zip_mundial/` → ese puerto.
+
+Si en `wwwroot` ves `bin/`, `Views/`, `Web.config` de **otro proyecto**, esa carpeta no es este Next.js.
+
+Detalle: [docs/RELEASE-CHECKLIST.md](docs/RELEASE-CHECKLIST.md)
+
+## Repo
+
+https://github.com/denche2005/mundial-2026-technip

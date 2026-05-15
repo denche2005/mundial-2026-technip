@@ -16,6 +16,10 @@ import {
 import { getSessionUser } from "@/lib/session";
 import { Flag } from "@/components/ui/flag";
 import { BracketScoringTable } from "@/components/bracket-scoring-table";
+import { TechnipLogoMark } from "@/components/ui/technip-logo-mark";
+
+const SECTION_LABEL =
+  "text-sm sm:text-base font-bold tracking-[0.12em] uppercase";
 
 const STADIUM_HERO =
   "https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=1600&q=80";
@@ -26,11 +30,11 @@ const FEATURED_TEAMS = [
 ];
 
 const MOCK_LEADERBOARD = [
-  { rank: 1, name: "Carlos M.", pts: 87, team: "ARG" },
-  { rank: 2, name: "Laura G.", pts: 82, team: "ESP" },
-  { rank: 3, name: "André S.", pts: 79, team: "BRA" },
-  { rank: 4, name: "Mía R.", pts: 76, team: "MEX" },
-  { rank: 5, name: "Tom W.", pts: 73, team: "ENG" },
+  { rank: 1, name: "Fernanda", pts: 87 },
+  { rank: 2, name: "Sacha", pts: 82 },
+  { rank: 3, name: "Carles", pts: 79 },
+  { rank: 4, name: "Edu", pts: 76 },
+  { rank: 5, name: "Denys", pts: 73 },
 ];
 
 export default async function LandingPage() {
@@ -97,7 +101,7 @@ export default async function LandingPage() {
                 href={user ? "/app/simulador" : "/register"}
                 className="group rounded-xl bg-[#0070ef] px-6 py-3 sm:px-8 sm:py-3.5 text-sm sm:text-base font-bold text-white shadow-[0_4px_16px_rgba(0,112,239,0.3)] hover:brightness-105 transition-all duration-300 flex items-center gap-2"
               >
-                {user ? "Ir al cuadro" : "Registrarse"}
+                {user ? "Ir al cuadro" : "Empezar"}
                 <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5 group-hover:translate-x-1 transition-transform" />
               </Link>
               <Link
@@ -128,7 +132,7 @@ export default async function LandingPage() {
         {/* HOW IT WORKS */}
         <section className="py-20 md:py-28">
           <div className="text-center mb-14">
-            <span className="text-[10px] font-bold tracking-widest text-[#0070ef] uppercase">3 PASOS SIMPLES</span>
+            <span className={`${SECTION_LABEL} text-[#0070ef]`}>3 PASOS SIMPLES</span>
             <h2 className="mt-3 text-[clamp(1.75rem,4vw,2.5rem)] font-bold text-[#004c84]">
               Cómo Funciona
             </h2>
@@ -183,7 +187,7 @@ export default async function LandingPage() {
         {/* SCORING TABLE */}
         <section className="py-16 md:py-24">
           <div className="text-center mb-12">
-            <span className="text-[10px] font-bold tracking-widest text-[#80c7a0] uppercase">SISTEMA DE PUNTOS</span>
+            <span className={`${SECTION_LABEL} text-[#80c7a0]`}>SISTEMA DE PUNTOS</span>
             <h2 className="mt-3 text-[clamp(1.75rem,4vw,2.5rem)] font-bold text-[#004c84]">
               Puntos por ronda
             </h2>
@@ -201,7 +205,7 @@ export default async function LandingPage() {
         <section className="py-16 md:py-24">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
-              <span className="text-[10px] font-bold tracking-widest text-[#ee7766] uppercase">RANKING EN VIVO</span>
+              <span className={`${SECTION_LABEL} text-[#ee7766]`}>RANKING EN VIVO</span>
               <h2 className="mt-3 text-[clamp(1.75rem,4vw,2.5rem)] font-bold text-[#004c84]">
                 ¿Puedes llegar al Top 10?
               </h2>
@@ -243,7 +247,7 @@ export default async function LandingPage() {
                     >
                       {player.rank}
                     </span>
-                    <Flag code={player.team} size="sm" />
+                    <TechnipLogoMark size="md" />
                     <span className="flex-1 font-medium text-[#1a1a2e]">{player.name}</span>
                     <span className="font-mono text-sm text-[#80c7a0] font-bold">
                       {player.pts} pts
@@ -263,7 +267,7 @@ export default async function LandingPage() {
         {/* FEATURES GRID */}
         <section className="py-16 md:py-24">
           <div className="text-center mb-12">
-            <span className="text-[10px] font-bold tracking-widest text-[#0070ef] uppercase">CARACTERÍSTICAS</span>
+            <span className={`${SECTION_LABEL} text-[#0070ef]`}>CARACTERÍSTICAS</span>
             <h2 className="mt-3 text-[clamp(1.75rem,4vw,2.5rem)] font-bold text-[#004c84]">
               Todo lo que necesitas
             </h2>

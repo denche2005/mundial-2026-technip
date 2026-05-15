@@ -80,9 +80,9 @@ export async function saveBracketRound(
         }
     }
 
-    revalidatePath("/app/admin/bracket");
-    revalidatePath("/app/ranking");
-    revalidatePath("/app/simulador");
+    revalidatePath("/app/admin/bracket", "page");
+    revalidatePath("/app/ranking", "page");
+    revalidatePath("/app/simulador", "page");
     revalidatePath("/app", "layout");
 
     return { success: true };

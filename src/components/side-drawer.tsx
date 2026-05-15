@@ -87,7 +87,9 @@ export function SideDrawer({ user, open, onClose }: SideDrawerProps) {
           </div>
           <div className="min-w-0">
             <h2 className="text-[#004c84] font-headline text-headline-sm truncate">{user.full_name ?? "Participante"}</h2>
-            <p className="font-data-mono text-data-mono text-[#555]">{user.rank ? `Puesto #${user.rank}` : "Sin clasificar todavía"}</p>
+            {user.rank != null && (
+              <p className="font-data-mono text-data-mono text-[#555]">Puesto #{user.rank}</p>
+            )}
             {isAdmin && (
               <p className="mt-1 inline-flex items-center gap-1 rounded bg-[#ee7766]/10 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[#ee7766]">Admin</p>
             )}

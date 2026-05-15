@@ -8,16 +8,14 @@
     "dev:fresh": "node scripts/clean-next.mjs && node scripts/run-dev-insecure-tls.cjs",
     "dev:insecure-tls": "node scripts/run-dev-insecure-tls.cjs",
     "build": "next build",
+    "package:standalone": "node scripts/prepare-standalone.mjs",
+    "build:deploy": "next build && node scripts/prepare-standalone.mjs",
     "start": "next start",
     "lint": "next lint",
     "hosting:probe": "node scripts/hosting-probe.mjs",
     "verify:env": "node scripts/verify-env.mjs",
     "test": "vitest run",
-    "test:watch": "vitest",
-    "scrape:fixtures": "tsx scripts/scrape-fifa-fixtures.ts",
-    "seed:matches": "tsx scripts/seed-matches.ts",
-    "audit:rls": "tsx --env-file=.env.local scripts/audit-rls.ts",
-    "test:rls": "tsx --env-file=.env.local scripts/test-rls.ts"
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@supabase/ssr": "^0",

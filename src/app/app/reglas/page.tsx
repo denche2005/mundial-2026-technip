@@ -28,37 +28,45 @@ export default async function ReglasPage() {
               Sistema de puntos
             </p>
             <h1 className="text-2xl font-bold text-[#004c84] leading-tight">
-              Puntuación (solo cuadro)
+              Cómo funciona
             </h1>
           </div>
         </div>
 
-        <p className="text-left text-sm leading-relaxed text-[#555]">
-          En esta porra interna solo cuenta el <strong className="text-[#1a1a2e]">cuadro eliminatorio</strong>.
-          Tus elecciones se comparan con el <strong className="text-[#1a1a2e]">bracket oficial</strong> que
-          configuran los administradores. No hay puntos por marcadores de partidos de fase de grupos.
-        </p>
-
-        <ul className="list-disc space-y-2 pl-5 text-left text-sm text-[#555] leading-relaxed">
-          <li>
-            Por cada equipo que aciertes en la posición correcta de cada ronda sumas los puntos indicados en la
-            tabla siguiente (misma lógica que en la página de inicio).
-          </li>
-          <li>
-            El ranking muestra una sola clasificación global: la suma de tus puntos de cuadro.
-          </li>
-          <li>
-            Puedes editar tu cuadro hasta la fecha de bloqueo configurada en el torneo (campo{" "}
-            <code className="text-xs text-[#0070ef]">tournament_start_at</code> en Supabase).
-          </li>
-        </ul>
+        <div className="space-y-4 text-left text-sm leading-relaxed text-[#555]">
+          <p>
+            Obtén puntos por adivinar equipos en el{" "}
+            <strong className="text-[#1a1a2e]">cuadro eliminatorio</strong>.
+          </p>
+          <ol className="list-decimal space-y-2.5 pl-5">
+            <li>
+              Ordena los equipos de cada grupo (quién queda{" "}
+              <strong className="text-[#1a1a2e]">1.º, 2.º, 3.º y 4.º</strong>).
+            </li>
+            <li>
+              A partir de estas predicciones se genera el{" "}
+              <strong className="text-[#1a1a2e]">cuadro de rondas eliminatorias</strong>.
+            </li>
+            <li>
+              Eliges <strong className="text-[#1a1a2e]">quién avanza</strong> en cada ronda hasta el campeón.
+            </li>
+            <li>
+              Conforme va avanzando el torneo, los administradores marcan las selecciones clasificadas. Recibes{" "}
+              <strong className="text-[#1a1a2e]">puntos por cada acierto</strong> en cada ronda.
+            </li>
+          </ol>
+          <p>
+            El <strong className="text-[#1a1a2e]">ranking</strong> es una sola clasificación: la suma de todos tus
+            aciertos. Puedes cambiar tu cuadro las veces que quieras hasta antes del inicio del torneo.
+          </p>
+        </div>
       </div>
 
       <div className="space-y-3">
         <div className="text-left">
           <h2 className="text-lg font-bold text-[#004c84]">Puntos por ronda</h2>
           <p className="mt-1 text-sm text-[#555]">
-            Cuanto más avanzada la ronda, más puntos por acierto. Acertar al campeón vale 10 puntos.
+            Desglose de cuántos puntos suma cada acierto según la ronda.
           </p>
         </div>
         <BracketScoringTable />

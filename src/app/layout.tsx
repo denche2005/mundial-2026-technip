@@ -1,19 +1,20 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { ServiceWorkerRegister } from "@/components/service-worker-register";
+import { withPublicBasePath } from "@/lib/base-path";
+
+const APP_ICON = withPublicBasePath("/logocrop.png");
 
 export const metadata: Metadata = {
   title: "Porra Technip — Mundial 2026",
   description:
     "Cuadro eliminatorio y ranking interno para el Mundial 2026. Registro con email y contraseña.",
   applicationName: "Technip Mundial 2026",
-  manifest: "/manifest.webmanifest",
+  manifest: withPublicBasePath("/manifest.webmanifest"),
   icons: {
-    icon: [
-      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
-      { url: "/icon-512.png", sizes: "512x512", type: "image/png" },
-    ],
-    apple: [{ url: "/icon-192.png", sizes: "180x180" }],
+    icon: [{ url: APP_ICON, type: "image/png" }],
+    apple: [{ url: APP_ICON, type: "image/png" }],
+    shortcut: [APP_ICON],
   },
   appleWebApp: {
     capable: true,
