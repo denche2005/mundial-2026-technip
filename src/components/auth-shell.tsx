@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { TechnipLogo } from "@/components/ui/technip-logo";
 
 function GoalIcon({ className }: { className?: string }) {
   return (
@@ -25,7 +26,7 @@ export function AuthShell({ children }: { children: React.ReactNode }) {
     <div className="flex min-h-[100dvh] flex-col bg-[#f8f9fa] text-[#1a1a2e]">
       <header className="sticky top-0 z-20 border-b border-[#dedede] bg-white shadow-sm">
         <div className="mx-auto flex h-16 w-full max-w-lg items-center justify-center gap-2 px-4">
-          <img src="/logo.png" alt="Technip Energies" className="h-8 w-auto" />
+          <TechnipLogo className="h-8 w-auto" />
         </div>
       </header>
 

@@ -16,6 +16,7 @@ import {
 import { getSessionUser } from "@/lib/session";
 import { Flag } from "@/components/ui/flag";
 import { BracketScoringTable } from "@/components/bracket-scoring-table";
+import { TechnipLogo } from "@/components/ui/technip-logo";
 import { TechnipLogoMark } from "@/components/ui/technip-logo-mark";
 
 const SECTION_LABEL =
@@ -46,7 +47,7 @@ export default async function LandingPage() {
       <header className="fixed top-0 left-0 right-0 z-50 h-14 border-b border-[#dedede] bg-white/90 backdrop-blur-xl sm:h-16 shadow-sm">
         <div className="mx-auto flex h-full w-full max-w-7xl items-center justify-between gap-2 px-3 sm:px-container-margin">
           <div className="flex min-w-0 items-center gap-2">
-            <img src="/logo.png" alt="Technip Energies" className="h-7 w-auto sm:h-8" />
+            <TechnipLogo className="h-7 w-auto sm:h-8" />
             <p className="hidden sm:block text-sm font-bold text-[#004c84]">Mundial 2026</p>
           </div>
           <div className="flex shrink-0 items-center gap-1 sm:gap-2">
@@ -325,7 +326,7 @@ export default async function LandingPage() {
       {/* FOOTER */}
       <footer className="border-t border-[#dedede] bg-[#f8f9fa] py-8">
         <div className="mx-auto flex w-full max-w-7xl items-center justify-center gap-2 px-container-margin text-sm text-[#878787]">
-          <img src="/logo.png" alt="Technip Energies" className="h-5 w-auto opacity-60" />
+          <TechnipLogo className="h-5 w-auto opacity-60" />
           <p>© {new Date().getFullYear()} Technip Energies</p>
         </div>
       </footer>

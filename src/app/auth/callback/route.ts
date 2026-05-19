@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import { cookiePathForApp } from "@/lib/base-path";
+import { isSessionCookieSecureFromRequest } from "@/lib/session-cookie";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/service";
 
@@ -70,16 +72,15 @@ export async function GET(request: Request) {
   const redirectUrl = new URL(next.startsWith("/") ? next : "/app", request.url);
   const response = NextResponse.redirect(redirectUrl);
 
-  const isSecure = process.env.NODE_ENV === "production" 
-    ? (process.env.NEXT_PUBLIC_SITE_URL || "").startsWith("https://") 
-    : false;
+  const secure = isSessionCookieSecureFromRequest(request);
+  const cookiePath = cookiePathForApp() || "/";
   const cookieOptions = [
     `session_user=${profileId as string}`,
-    `Path=/`,
+    `Path=${cookiePath}`,
     `Max-Age=${60 * 60 * 24 * 90}`,
     `SameSite=Lax`,
     `HttpOnly`,
-    ...(isSecure ? ["Secure"] : []),
+    ...(secure ? ["Secure"] : []),
   ].join("; ");
 
   response.headers.append("Set-Cookie", cookieOptions);

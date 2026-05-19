@@ -1,8 +1,9 @@
 "use client";
 
-import { useCallback, useRef } from "react";
+import { useCallback, useRef, useState } from "react";
 import { clsx } from "clsx";
 import { LocateFixed } from "lucide-react";
+import { TechnipLogoMark } from "@/components/ui/technip-logo-mark";
 import type { LeaderboardEntry } from "@/lib/types";
 
 interface RankingListProps {
@@ -104,17 +105,7 @@ function RankingRowContent({
               : ""
         )}
       >
-        {entry.avatar_url ? (
-          <img
-            src={entry.avatar_url}
-            alt={entry.full_name ?? "Avatar"}
-            className="h-full w-full object-cover"
-          />
-        ) : (
-          <span className="text-sm font-bold text-[#004c84]">
-            {(entry.full_name ?? "A").charAt(0).toUpperCase()}
-          </span>
-        )}
+        <RankingAvatar url={entry.avatar_url} name={entry.full_name} />
       </div>
 
       <div className="flex items-center min-w-0 flex-1 gap-2">
@@ -139,12 +130,7 @@ function RankingRowContent({
       </div>
 
       <div className="flex items-baseline gap-1 shrink-0">
-        <span
-          className={clsx(
-            "text-lg font-bold tabular-nums",
-            isSelf || isFirst ? "text-[#80c7a0]" : "text-[#1a1a2e]"
-          )}
-        >
+        <span className="text-lg font-bold tabular-nums text-[#004c84]">
           {entry.total_points.toLocaleString("es-ES")}
         </span>
         <span className="text-[10px] font-bold text-[#878787] uppercase tracking-wide">
@@ -154,3 +140,29 @@ function RankingRowContent({
     </div>
   );
 }
+
+function RankingAvatar({
+  url,
+  name,
+}: {
+  url: string | null;
+  name: string | null;
+}) {
+  const [broken, setBroken] = useState(false);
+
+  if (!url || broken) {
+    return <TechnipLogoMark size="sm" className="h-full w-full" />;
+  }
+
+  return (
+    <img
+      src={url}
+      alt={name ?? "Avatar"}
+      className="h-full w-full object-cover"
+      referrerPolicy="no-referrer"
+      onError={() => setBroken(true)}
+    />
+  );
+}
+
+

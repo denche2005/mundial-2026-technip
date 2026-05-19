@@ -6,6 +6,7 @@ import { createServiceClient } from "@/lib/supabase/service";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { sanitizeInternalPath } from "@/lib/auth-redirect";
 import { cookiePathForApp, withPublicBasePath } from "@/lib/base-path";
+import { isSessionCookieSecure } from "@/lib/session-cookie";
 import { pbkdf2Sync, randomBytes, timingSafeEqual } from "crypto";
 
 function hashPassword(password: string) {
@@ -78,13 +79,11 @@ export async function loginWithPassword(
     if (!verifyPassword(password, byEmail.password_hash)) return { error: "Contraseña incorrecta." };
 
     const cookieStore = await cookies();
-    const isSecure = process.env.NODE_ENV === "production"
-      ? (process.env.NEXT_PUBLIC_SITE_URL || "").startsWith("https://")
-      : false;
+    const secure = await isSessionCookieSecure();
 
     cookieStore.set("session_user", byEmail.id, {
       httpOnly: true,
-      secure: isSecure,
+      secure,
       sameSite: "lax",
       maxAge: 60 * 60 * 24 * 90,
       path: cookiePathForApp(),
@@ -129,13 +128,11 @@ export async function registerWithPassword(
     }
 
     const cookieStore = await cookies();
-    const isSecure = process.env.NODE_ENV === "production"
-      ? (process.env.NEXT_PUBLIC_SITE_URL || "").startsWith("https://")
-      : false;
+    const secure = await isSessionCookieSecure();
 
     cookieStore.set("session_user", created.id, {
       httpOnly: true,
-      secure: isSecure,
+      secure,
       sameSite: "lax",
       maxAge: 60 * 60 * 24 * 90,
       path: cookiePathForApp(),

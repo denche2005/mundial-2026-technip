@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState, useCallback } from "react";
 import { Menu } from "lucide-react";
+import { TechnipLogo } from "@/components/ui/technip-logo";
 import { SideDrawer } from "./side-drawer";
 
 interface TopAppBarProps {
@@ -38,7 +39,7 @@ export function TopAppBar({ user }: TopAppBarProps) {
           </button>
 
           <Link href="/app" className="flex items-center">
-            <img src="/logo.png" alt="Technip Energies" className="h-8 w-auto" />
+            <TechnipLogo className="h-8 w-auto" />
           </Link>
         </div>
 
