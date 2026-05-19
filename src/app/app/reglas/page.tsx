@@ -51,13 +51,17 @@ export default async function ReglasPage() {
               Eliges <strong className="text-[#1a1a2e]">quién avanza</strong> en cada ronda hasta el campeón.
             </li>
             <li>
+              Predices el <strong className="text-[#1a1a2e]">máximo goleador</strong> del torneo (5 puntos si aciertas).
+            </li>
+            <li>
               Conforme va avanzando el torneo, los administradores marcan las selecciones clasificadas. Recibes{" "}
               <strong className="text-[#1a1a2e]">puntos por cada acierto</strong> en cada ronda.
             </li>
           </ol>
           <p>
-            El <strong className="text-[#1a1a2e]">ranking</strong> es una sola clasificación: la suma de todos tus
-            aciertos. Puedes cambiar tu cuadro las veces que quieras hasta antes del inicio del torneo.
+            El <strong className="text-[#1a1a2e]">ranking</strong> es una sola clasificación: cuadro + goleador.
+            Los participantes pueden ver el cuadro de los demás desde la clasificación. Puedes cambiar tus
+            predicciones hasta antes del inicio del torneo.
           </p>
         </div>
       </div>

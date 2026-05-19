@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { getSessionUser } from "@/lib/session";
 import { createServiceClient } from "@/lib/supabase/service";
 import { AdminBracketPanel } from "@/components/admin-bracket-panel";
+import { AdminGoldenBootPanel } from "@/components/admin-golden-boot-panel";
 import { WORLD_CUP_GROUPS } from "@/lib/bracket/groups";
 
 const ROUND_ORDER = ["r32", "r16", "qf", "sf", "final"] as const;
@@ -26,6 +27,12 @@ export default async function AdminBracketPage() {
     .select("round, position, team")
     .in("round", [...ROUND_ORDER, "champion"])
     .order("position", { ascending: true });
+
+  const { data: goldenBootResult } = await supabase
+    .from("golden_boot_result")
+    .select("player_id")
+    .eq("id", 1)
+    .maybeSingle();
 
   const rounds = ROUND_ORDER.map((round) => ({
     round,
@@ -62,6 +69,8 @@ export default async function AdminBracketPage() {
           initialResults={results ?? []}
           teamPool={WORLD_CUP_GROUPS.flatMap((g) => g.teams)}
         />
+
+        <AdminGoldenBootPanel initialPlayerId={goldenBootResult?.player_id ?? null} />
       </div>
     </div>
   );

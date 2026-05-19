@@ -87,3 +87,30 @@ export async function saveBracketRound(
 
     return { success: true };
 }
+
+export async function saveGoldenBootResult(playerId: string) {
+    try {
+        await requireAdmin();
+    } catch {
+        return { error: "No autorizado" };
+    }
+
+    const id = playerId.trim();
+    if (!id) return { error: "Selecciona el goleador oficial." };
+
+    const supabase = createServiceClient();
+    const { error } = await supabase
+        .from("golden_boot_result")
+        .upsert(
+            { id: 1, player_id: id, updated_at: new Date().toISOString() },
+            { onConflict: "id" }
+        );
+
+    if (error) {
+        return { error: "No se pudo guardar el goleador oficial." };
+    }
+
+    revalidatePath("/app/admin/bracket", "page");
+    revalidatePath("/app/ranking", "page");
+    return { success: true };
+}

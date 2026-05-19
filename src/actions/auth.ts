@@ -6,7 +6,7 @@ import { createServiceClient } from "@/lib/supabase/service";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { sanitizeInternalPath } from "@/lib/auth-redirect";
 import { cookiePathForApp, withPublicBasePath } from "@/lib/base-path";
-import { isSessionCookieSecure } from "@/lib/session-cookie";
+import { isSessionCookieSecure, sessionCookieOptions } from "@/lib/session-cookie";
 import { pbkdf2Sync, randomBytes, timingSafeEqual } from "crypto";
 
 function hashPassword(password: string) {
@@ -155,10 +155,12 @@ export async function logout() {
   }
 
   const cookieStore = await cookies();
-  cookieStore.set("session_user", "", {
-    httpOnly: true,
-    path: cookiePathForApp(),
-    maxAge: 0,
-  });
-  redirect("/");
+  const opts = await sessionCookieOptions(0);
+  cookieStore.set("session_user", "", opts);
+  // Clear legacy cookies set at Path=/ (builds sin basePath o pruebas antiguas).
+  if (opts.path !== "/") {
+    cookieStore.set("session_user", "", { ...opts, path: "/" });
+  }
+
+  redirect(withPublicBasePath("/"));
 }

@@ -14,6 +14,12 @@ export default async function SimuladorPage() {
     .select("*")
     .eq("user_id", user.id);
 
+  const { data: goldenBoot } = await service
+    .from("golden_boot_predictions")
+    .select("player_id")
+    .eq("user_id", user.id)
+    .maybeSingle();
+
   const { data: config } = await service
     .from("tournament_config")
     .select("*")
@@ -38,6 +44,7 @@ export default async function SimuladorPage() {
           predictions={predictions ?? []}
           isLocked={isLocked}
           userName={user.full_name ?? "Jugador"}
+          goldenBootPlayerId={goldenBoot?.player_id ?? null}
         />
       </div>
     </div>

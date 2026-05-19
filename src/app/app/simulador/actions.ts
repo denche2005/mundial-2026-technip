@@ -88,3 +88,49 @@ export async function saveBracketPredictions(
   revalidatePath("/app/ranking");
   return { success: true };
 }
+
+export async function saveGoldenBootPrediction(playerId: string) {
+  let user;
+  try {
+    user = await requireSessionUser();
+  } catch {
+    return { error: "Sesión expirada. Vuelve a iniciar sesión." };
+  }
+
+  const id = playerId.trim();
+  if (!id) return { error: "Selecciona un jugador." };
+
+  let service;
+  try {
+    service = createServiceClient();
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    return { error: msg };
+  }
+
+  const { data: config } = await service
+    .from("tournament_config")
+    .select("tournament_start_at")
+    .maybeSingle();
+
+  if (config && new Date(config.tournament_start_at) <= new Date()) {
+    return { error: "Las predicciones están bloqueadas — el torneo ya ha comenzado." };
+  }
+
+  const { error } = await service.from("golden_boot_predictions").upsert(
+    {
+      user_id: user.id,
+      player_id: id,
+      updated_at: new Date().toISOString(),
+    },
+    { onConflict: "user_id" }
+  );
+
+  if (error) {
+    return { error: "No se pudo guardar el goleador. Inténtalo de nuevo." };
+  }
+
+  revalidatePath("/app/ranking");
+  revalidatePath("/app/simulador");
+  return { success: true };
+}

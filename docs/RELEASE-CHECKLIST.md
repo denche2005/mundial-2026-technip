@@ -3,7 +3,7 @@
 ## Local
 
 - [ ] `.env.local` desde `.env.local.example` · `npm run verify:env`
-- [ ] Migraciones `supabase/migrations/` 001–004 aplicadas
+- [ ] Migraciones `supabase/migrations/` 001–006 aplicadas (005 puntuación por equipo, 006 goleador)
 - [ ] `npm run dev` o `npm run dev:insecure-tls -- --port 3000` (proxy corporativo)
 - [ ] Smoke: `/` · `/login` · `/register` · `/app/simulador` · `/app/ranking` · `/app/reglas`
 

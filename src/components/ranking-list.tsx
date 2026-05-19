@@ -1,8 +1,9 @@
 "use client";
 
 import { useCallback, useRef, useState } from "react";
+import Link from "next/link";
 import { clsx } from "clsx";
-import { LocateFixed } from "lucide-react";
+import { LocateFixed, ChevronRight } from "lucide-react";
 import { TechnipLogoMark } from "@/components/ui/technip-logo-mark";
 import type { LeaderboardEntry } from "@/lib/types";
 
@@ -49,23 +50,25 @@ export function RankingList({ rows, currentUserId, myRank }: RankingListProps) {
           const isFirst = rank === 1;
 
           return (
-            <div
+            <Link
               key={entry.user_id}
-              ref={isSelf ? selfRef : undefined}
+              href={`/app/usuario/${entry.user_id}`}
               className={clsx(
-                "px-4 py-3 rounded-2xl transition-all bg-white border shadow-sm scroll-mt-24",
+                "block px-4 py-3 rounded-2xl transition-all bg-white border shadow-sm scroll-mt-24",
                 isSelf
                   ? "border-[#0070ef] shadow-[0_0_12px_rgba(0,112,239,0.1)]"
-                  : "border-[#dedede] hover:shadow-md"
+                  : "border-[#dedede] hover:shadow-md hover:border-[#0070ef]/40"
               )}
             >
-              <RankingRowContent
-                entry={entry}
-                rank={rank}
-                isSelf={isSelf}
-                isFirst={isFirst}
-              />
-            </div>
+              <div ref={isSelf ? selfRef : undefined}>
+                <RankingRowContent
+                  entry={entry}
+                  rank={rank}
+                  isSelf={isSelf}
+                  isFirst={isFirst}
+                />
+              </div>
+            </Link>
           );
         })}
       </div>
@@ -136,6 +139,7 @@ function RankingRowContent({
         <span className="text-[10px] font-bold text-[#878787] uppercase tracking-wide">
           pts
         </span>
+        <ChevronRight className="h-4 w-4 text-[#878787] shrink-0 ml-0.5" aria-hidden />
       </div>
     </div>
   );

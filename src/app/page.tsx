@@ -4,14 +4,8 @@ import {
   Trophy,
   UserPlus,
   CalendarDays,
-  Share2,
   ArrowRight,
   ChevronRight,
-  Users,
-  Target,
-  Zap,
-  Globe,
-  Star,
 } from "lucide-react";
 import { getSessionUser } from "@/lib/session";
 import { Flag } from "@/components/ui/flag";
@@ -262,36 +256,6 @@ export default async function LandingPage() {
                 </span>
               </div>
             </div>
-          </div>
-        </section>
-
-        {/* FEATURES GRID */}
-        <section className="py-16 md:py-24">
-          <div className="text-center mb-12">
-            <span className={`${SECTION_LABEL} text-[#0070ef]`}>CARACTERÍSTICAS</span>
-            <h2 className="mt-3 text-[clamp(1.75rem,4vw,2.5rem)] font-bold text-[#004c84]">
-              Todo lo que necesitas
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {[
-              { icon: Target, title: "Cuadro eliminatorio", desc: "R32, octavos, cuartos, semifinal, final y campeón.", color: "#0070ef" },
-              { icon: Share2, title: "Bracket oficial", desc: "Los administradores fijan el resultado oficial.", color: "#80c7a0" },
-              { icon: Users, title: "Acceso interno", desc: "Registro con email para el equipo Technip.", color: "#ee7766" },
-              { icon: Zap, title: "Guardado seguro", desc: "Tus picks se guardan en Supabase.", color: "#0070ef" },
-              { icon: Globe, title: "Flujo simple", desc: "Cuadro + ranking. Sin complicaciones.", color: "#80c7a0" },
-              { icon: Star, title: "Ranking global", desc: "Una sola clasificación con los puntos del cuadro.", color: "#ee7766" },
-            ].map((feat) => (
-              <div
-                key={feat.title}
-                className="group rounded-xl border border-[#dedede] bg-white p-6 hover:shadow-md transition-all"
-              >
-                <feat.icon className="h-5 w-5 mb-3 group-hover:scale-110 transition-transform" style={{ color: feat.color }} />
-                <h3 className="font-bold text-[#1a1a2e]">{feat.title}</h3>
-                <p className="mt-2 text-sm text-[#555] leading-relaxed">{feat.desc}</p>
-              </div>
-            ))}
           </div>
         </section>
 

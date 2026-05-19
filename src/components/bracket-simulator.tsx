@@ -22,6 +22,7 @@ import { saveBracketPredictions } from "@/app/app/simulador/actions";
 import { SaveIndicator } from "@/components/ui/save-indicator";
 import { Flag } from "@/components/ui/flag";
 import { ShareBracketButton } from "@/components/share-bracket-button";
+import { GoldenBootPicker } from "@/components/golden-boot-picker";
 import { BRACKET_CAPTURE_WIDTH_PX } from "@/lib/bracket/bracket-layout";
 
 type SaveState = "idle" | "saving" | "saved" | "error";
@@ -45,6 +46,8 @@ interface Props {
   predictions: BracketPrediction[];
   isLocked: boolean;
   userName?: string;
+  readOnly?: boolean;
+  goldenBootPlayerId?: string | null;
 }
 
 function buildInitialState(predictions: BracketPrediction[]) {
@@ -105,7 +108,14 @@ function predictionsSignature(rows: BracketPrediction[]) {
     .join("|");
 }
 
-export function BracketSimulator({ predictions, isLocked, userName = "Jugador" }: Props) {
+export function BracketSimulator({
+  predictions,
+  isLocked,
+  userName = "Jugador",
+  readOnly = false,
+  goldenBootPlayerId = null,
+}: Props) {
+  const canEdit = !isLocked && !readOnly;
   const initial = useMemo(() => buildInitialState(predictions), [predictions]);
   const [standings, setStandings] = useState<Record<string, string[]>>(initial.standings);
   const [bestThirds, setBestThirds] = useState<string[]>(initial.bestThirds);
@@ -192,7 +202,7 @@ export function BracketSimulator({ predictions, isLocked, userName = "Jugador" }
   }, [bracket, picks, bestThirds, standings, mobileNaturalBracketSize]);
 
   const persist = useCallback(async () => {
-    if (isLocked) return;
+    if (!canEdit) return;
     const payload: { round: string; position: number; team: string }[] = [];
 
     Object.entries(standings).forEach(([, arr], groupIndex) => {
@@ -231,9 +241,10 @@ export function BracketSimulator({ predictions, isLocked, userName = "Jugador" }
     if (!result.error) {
       setTimeout(() => setSaveState("idle"), 1500);
     }
-  }, [isLocked, standings, bestThirds, bracket, picks]);
+  }, [canEdit, standings, bestThirds, bracket, picks]);
 
   useEffect(() => {
+    if (!canEdit) return;
     if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
     const hasAny = Object.values(standings).some((s) => s.length > 0);
     if (!hasAny) return;
@@ -241,7 +252,7 @@ export function BracketSimulator({ predictions, isLocked, userName = "Jugador" }
     return () => {
       if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
     };
-  }, [standings, bestThirds, picks, persist]);
+  }, [canEdit, standings, bestThirds, picks, persist]);
 
   const thirdSignature = useMemo(
     () =>
@@ -271,7 +282,7 @@ export function BracketSimulator({ predictions, isLocked, userName = "Jugador" }
 
   const toggleTeamInGroup = useCallback(
     (groupCode: string, team: string) => {
-      if (isLocked) return;
+      if (!canEdit) return;
       userDirtyRef.current = true;
       setStandings((prev) => {
         const current = [...(prev[groupCode] ?? [])];
@@ -284,16 +295,16 @@ export function BracketSimulator({ predictions, isLocked, userName = "Jugador" }
         return { ...prev, [groupCode]: [...current, team] };
       });
     },
-    [isLocked]
+    [canEdit]
   );
 
   const pickWinner = useCallback(
     (matchId: string, team: string) => {
-      if (isLocked) return;
+      if (!canEdit) return;
       userDirtyRef.current = true;
       setPicks((prev) => ({ ...prev, [matchId]: team }));
     },
-    [isLocked]
+    [canEdit]
   );
 
   const isComplete = useMemo(() => {
@@ -349,7 +360,7 @@ export function BracketSimulator({ predictions, isLocked, userName = "Jugador" }
                         key={team}
                         type="button"
                         onClick={() => toggleTeamInGroup(group.code, team)}
-                        disabled={isLocked}
+                        disabled={!canEdit}
                         className={clsx(
                           "rounded-lg px-2 py-2 text-left border transition-colors duration-150 flex items-center gap-2",
                           isSelected
@@ -424,7 +435,7 @@ export function BracketSimulator({ predictions, isLocked, userName = "Jugador" }
                           : prev;
                     })
                   }
-                  disabled={isLocked}
+                  disabled={!canEdit}
                   className={clsx(
                     "rounded-full px-3 py-1.5 border text-sm flex items-center gap-2 transition-colors duration-150",
                     active
@@ -443,6 +454,12 @@ export function BracketSimulator({ predictions, isLocked, userName = "Jugador" }
           </p>
         </div>
       </section>
+
+      <GoldenBootPicker
+        initialPlayerId={goldenBootPlayerId}
+        isLocked={isLocked}
+        readOnly={readOnly}
+      />
 
       <section className="space-y-4">
         <h2 className="font-headline-lg text-headline-lg text-[#004c84]">Camino a la final</h2>
@@ -486,7 +503,7 @@ export function BracketSimulator({ predictions, isLocked, userName = "Jugador" }
               bracket={bracket}
               picks={picks}
               onPick={pickWinner}
-              locked={isLocked}
+              locked={!canEdit}
             />
 
             <div className="mt-4 flex flex-col gap-1 border-t border-[#dedede] pt-3 text-[10px] text-[#878787] sm:flex-row sm:items-center sm:justify-between sm:gap-3">
@@ -506,7 +523,7 @@ export function BracketSimulator({ predictions, isLocked, userName = "Jugador" }
         )}
       </section>
 
-      {isComplete && (
+      {canEdit && isComplete && (
         <div className="pb-24">
           <ShareBracketButton captureRef={captureRef} userName={userName} />
         </div>

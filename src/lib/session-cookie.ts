@@ -1,4 +1,5 @@
 import { headers } from "next/headers";
+import { cookiePathForApp } from "@/lib/base-path";
 
 function protoIsHttps(proto: string | null): boolean {
   if (!proto) return false;
@@ -27,4 +28,23 @@ export function isSessionCookieSecureFromRequest(request: Request): boolean {
   if (hostIsLocal(url.host)) return false;
   if (process.env.NODE_ENV !== "production") return false;
   return url.protocol === "https:";
+}
+
+export type SessionCookieOptions = {
+  httpOnly: true;
+  secure: boolean;
+  sameSite: "lax";
+  maxAge: number;
+  path: string;
+};
+
+/** Same attributes as login/register so the browser actually deletes the cookie. */
+export async function sessionCookieOptions(maxAge: number): Promise<SessionCookieOptions> {
+  return {
+    httpOnly: true,
+    secure: await isSessionCookieSecure(),
+    sameSite: "lax",
+    maxAge,
+    path: cookiePathForApp(),
+  };
 }
