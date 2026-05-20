@@ -175,15 +175,7 @@ function RegisterContent() {
                 className="mt-1 h-4 w-4 rounded border-[#dedede] bg-[#f8f9fa] text-[#0070ef] focus:ring-[#0070ef]"
               />
               <span className="text-sm text-[#555] leading-snug">
-                Acepto los{" "}
-                <Link href="#" className="font-semibold text-[#0070ef] hover:underline">
-                  Términos y Condiciones
-                </Link>{" "}
-                y la{" "}
-                <Link href="#" className="font-semibold text-[#0070ef] hover:underline">
-                  Política de Privacidad
-                </Link>
-                . Entiendo que mi{" "}
+                Entiendo que mi{" "}
                 <strong className="text-[#1a1a2e]">cuadro y predicción de goleador</strong>{" "}
                 serán visibles para el resto de participantes en el ranking interno.
               </span>

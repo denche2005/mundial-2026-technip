@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useRef, useState, useTransition } from "react";
 import { clsx } from "clsx";
 import { Target, Pencil } from "lucide-react";
 import { Flag } from "@/components/ui/flag";
@@ -15,6 +15,7 @@ interface Props {
   readOnly?: boolean;
 }
 
+
 export function GoldenBootPicker({
   initialPlayerId,
   isLocked,
@@ -24,9 +25,23 @@ export function GoldenBootPicker({
   const [editing, setEditing] = useState(!initialPlayerId);
   const [message, setMessage] = useState("");
   const [pending, startTransition] = useTransition();
+  const expandedRef = useRef<HTMLDivElement>(null);
 
   const selected = findGoldenBootPlayer(playerId);
   const canEdit = !isLocked && !readOnly;
+  const showPicker = canEdit && (editing || !selected);
+
+  function collapsePicker() {
+    const el = expandedRef.current;
+    const heightRemoved = el?.offsetHeight ?? 0;
+    const top = el?.getBoundingClientRect().top ?? Infinity;
+    setEditing(false);
+    if (heightRemoved > 0 && top <= window.innerHeight) {
+      requestAnimationFrame(() => {
+        window.scrollBy({ top: -heightRemoved, left: 0, behavior: "instant" });
+      });
+    }
+  }
 
   function persist(nextPlayerId: string) {
     if (!canEdit || !nextPlayerId) return;
@@ -36,7 +51,7 @@ export function GoldenBootPicker({
       if (result.error) setMessage(result.error);
       else {
         setMessage("Guardado");
-        setEditing(false);
+        collapsePicker();
       }
       setTimeout(() => setMessage(""), 2000);
     });
@@ -61,8 +76,6 @@ export function GoldenBootPicker({
     );
   }
 
-  const showPicker = canEdit && (editing || !selected);
-
   return (
     <section className="space-y-4">
       <div className="flex items-center gap-2">
@@ -73,8 +86,8 @@ export function GoldenBootPicker({
       </div>
 
       {showPicker ? (
-        <>
-          <p className="text-body-md text-[#555] -mt-2">
+        <div ref={expandedRef} className="space-y-4">
+          <p className="text-body-md text-[#555]">
             Elige al jugador que crees que será el máximo goleador del torneo. Si aciertas,
             sumas <strong className="text-[#1a1a2e]">5 puntos</strong> extra.
           </p>
@@ -98,7 +111,7 @@ export function GoldenBootPicker({
               </p>
             ) : null}
           </div>
-        </>
+        </div>
       ) : selected ? (
         <button
           type="button"
