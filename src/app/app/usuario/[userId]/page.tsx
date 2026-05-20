@@ -55,7 +55,7 @@ export default async function UsuarioBracketPage({
       <div className="relative mx-auto max-w-6xl">
         <BracketSimulator
           predictions={predictions ?? []}
-          isLocked
+          isLocked={false}
           readOnly
           userName={profile.full_name ?? "Jugador"}
           goldenBootPlayerId={goldenBoot?.player_id ?? null}

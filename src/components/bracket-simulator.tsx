@@ -318,23 +318,27 @@ export function BracketSimulator({
 
   return (
     <div className="space-y-8">
-      {isLocked && (
+      {isLocked && !readOnly && (
         <div className="rounded-xl border border-[#dedede] bg-white p-3 text-[#555] font-body-md flex items-center gap-2">
           <Lock className="h-4 w-4" />
           Bracket bloqueado: el torneo ya comenzó.
         </div>
       )}
 
-      <div className="flex justify-end">
-        <SaveIndicator state={saveState} />
-      </div>
+      {canEdit ? (
+        <div className="flex justify-end">
+          <SaveIndicator state={saveState} />
+        </div>
+      ) : null}
 
       <section className="space-y-4">
         <h2 className="font-headline-lg text-headline-lg text-[#004c84]">Fase de grupos</h2>
-        <p className="text-body-md text-[#555] -mt-2">
-          Marca los 3 primeros de cada grupo. El 4º se rellena automáticamente
-          con el equipo eliminado.
-        </p>
+        {!readOnly ? (
+          <p className="text-body-md text-[#555] -mt-2">
+            Marca los 3 primeros de cada grupo. El 4º se rellena automáticamente
+            con el equipo eliminado.
+          </p>
+        ) : null}
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           {WORLD_CUP_GROUPS.map((group) => {
             const selected = standings[group.code] ?? [];
@@ -461,13 +465,23 @@ export function BracketSimulator({
         readOnly={readOnly}
       />
 
+      {readOnly && !bracket ? (
+        <div className="rounded-xl border border-[#dedede] bg-white px-4 py-3 shadow-sm">
+          <p className="text-sm text-[#555]">
+            <span className="font-semibold text-[#004c84]">Cuadro eliminatorio:</span>{" "}
+            <span className="text-[#878787]">No completado</span>
+          </p>
+        </div>
+      ) : (
       <section className="space-y-4">
         <h2 className="font-headline-lg text-headline-lg text-[#004c84]">Camino a la final</h2>
 
         {!bracket ? (
+          readOnly ? null : (
           <p className="mx-auto max-w-xl px-2 text-center text-sm leading-relaxed text-[#555] sm:px-0 sm:text-left">
             Completa 1º y 2º en cada grupo para generar el cuadro.
           </p>
+          )
         ) : (
         <div className="rounded-2xl border border-[#dedede] bg-white p-3 md:p-5 w-full max-w-full min-w-0 overflow-x-auto overscroll-x-contain shadow-sm">
           <div
@@ -522,6 +536,7 @@ export function BracketSimulator({
         </div>
         )}
       </section>
+      )}
 
       {canEdit && isComplete && (
         <div className="pb-24">

@@ -186,8 +186,9 @@ export default async function LandingPage() {
             <h2 className="mt-3 text-[clamp(1.75rem,4vw,2.5rem)] font-bold text-[#004c84]">
               Puntos por ronda
             </h2>
-            <p className="mt-3 text-sm text-[#555] max-w-lg mx-auto">
-              Cuanto más avanzada la ronda, más puntos por acierto. ¡Acertar al campeón vale 10!
+            <p className="mt-3 text-sm text-[#555] max-w-xl mx-auto">
+              Cuanto más avanzada la ronda, más puntos por acierto.{" "}
+              <span className="whitespace-nowrap">¡Acertar al campeón vale 10!</span>
             </p>
           </div>
 

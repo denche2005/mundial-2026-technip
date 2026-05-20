@@ -29,7 +29,7 @@ export function AdminGoldenBootPanel({
     <section className="rounded-xl border border-[#dedede] bg-white p-porra-md shadow-sm space-y-4">
       <div className="flex items-center gap-2">
         <Target className="h-5 w-5 text-[#ee7766]" />
-        <h2 className="text-xl font-bold text-[#004c84]">Goleador oficial (pichichi)</h2>
+        <h2 className="text-xl font-bold text-[#004c84]">Goleador oficial</h2>
       </div>
       <p className="text-sm text-[#555]">
         Fija el máximo goleador del torneo. Los usuarios que lo hayan elegido suman 5 puntos en el ranking.

@@ -6,7 +6,7 @@ export const BRACKET_SCORING_ROWS = [
   { round: "Semifinal (1/2)", pts: 4, count: 4 },
   { round: "Final", pts: 5, count: 2 },
   { round: "Campeón", pts: 10, count: 1 },
-  { round: "Máximo goleador (pichichi)", pts: 5, count: 1 },
+  { round: "Máximo goleador", pts: 5, count: 1 },
 ] as const;
 
 export function bracketScoringBadgeClass(pts: number): string {
